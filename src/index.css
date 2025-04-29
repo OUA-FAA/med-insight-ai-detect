@@ -16,24 +16,24 @@
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
 
-    --primary: 348 100% 93%;
-    --primary-foreground: 348 100% 30%;
+    --primary: 210 100% 56%;
+    --primary-foreground: 210 100% 98%;
 
-    --secondary: 246 71% 97%;
-    --secondary-foreground: 240 5.9% 10%;
+    --secondary: 100 56% 92%;
+    --secondary-foreground: 100 20% 30%;
 
     --muted: 210 40% 96.1%;
     --muted-foreground: 215.4 16.3% 46.9%;
 
-    --accent: 348 100% 93%;
-    --accent-foreground: 348 100% 30%;
+    --accent: 210 100% 56%;
+    --accent-foreground: 210 100% 98%;
 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
 
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
-    --ring: 348 100% 93%;
+    --ring: 210 100% 56%;
 
     --radius: 0.75rem;
 
@@ -62,19 +62,19 @@
   }
   
   .btn-primary {
-    @apply px-6 py-3 bg-soft-pink text-dark-gray font-medium rounded-lg hover:bg-opacity-80 transition-all duration-200 flex items-center justify-center gap-2;
+    @apply px-6 py-3 bg-med-blue text-white font-medium rounded-lg hover:bg-dark-blue transition-all duration-300 flex items-center justify-center gap-2;
   }
   
   .btn-secondary {
-    @apply px-6 py-3 bg-soft-gray text-dark-gray font-medium rounded-lg hover:bg-opacity-80 transition-all duration-200 flex items-center justify-center gap-2;
+    @apply px-6 py-3 bg-soft-gray text-dark-gray font-medium rounded-lg hover:bg-opacity-80 transition-all duration-300 flex items-center justify-center gap-2;
   }
   
   .upload-zone {
-    @apply border-2 border-dashed border-soft-pink rounded-xl p-8 bg-soft-pink bg-opacity-10 flex flex-col items-center justify-center transition-all duration-200;
+    @apply border-2 border-dashed border-med-blue rounded-xl p-8 bg-soft-blue bg-opacity-10 flex flex-col items-center justify-center transition-all duration-300;
   }
   
   .upload-zone-active {
-    @apply bg-soft-pink bg-opacity-20 border-primary;
+    @apply bg-soft-blue bg-opacity-20 border-primary;
   }
   
   .result-card {
@@ -86,6 +86,20 @@
   }
   
   .confidence-progress {
-    @apply h-full bg-soft-pink transition-all duration-500 ease-out;
+    @apply h-full bg-med-blue transition-all duration-500 ease-out;
+  }
+
+  /* Nouvelles classes pour les animations et interactions */
+  .hover-scale {
+    @apply transition-transform duration-300 hover:scale-105;
+  }
+
+  .card-hover {
+    @apply transition-all duration-300 hover:shadow-md hover:-translate-y-1;
+  }
+
+  .interactive-element {
+    @apply transition-colors duration-200;
   }
 }
+

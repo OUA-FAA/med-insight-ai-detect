@@ -63,8 +63,12 @@ export default {
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
 				},
-				// Custom theme colors
-				"soft-pink": "#FFDEE2",
+				// Nouvelle palette de couleurs
+				"soft-blue": "#D3E4FD",
+				"med-blue": "#70B3F8",  
+				"dark-blue": "#3A86FF",
+				"soft-green": "#E2F5E9",
+				"med-green": "#6CD0A8",
 				"soft-gray": "#F1F0FB",
 				"med-gray": "#8A898C",
 				"dark-gray": "#333333",
@@ -95,14 +99,27 @@ export default {
 					'0%': { opacity: '0', transform: 'translateY(10px)' },
 					'100%': { opacity: '1', transform: 'translateY(0)' },
 				},
+				'slide-in': {
+					'0%': { opacity: '0', transform: 'translateX(-10px)' },
+					'100%': { opacity: '1', transform: 'translateX(0)' },
+				},
+				'ping-slow': {
+					'75%, 100%': {
+						transform: 'scale(1.1)',
+						opacity: '0'
+					}
+				}
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
 				'accordion-up': 'accordion-up 0.2s ease-out',
 				'pulse-soft': 'pulse-soft 2s infinite',
 				'fade-in': 'fade-in 0.5s ease-out',
+				'slide-in': 'slide-in 0.3s ease-out',
+				'ping-slow': 'ping-slow 1.5s cubic-bezier(0, 0, 0.2, 1) infinite'
 			}
 		}
 	},
 	plugins: [require("tailwindcss-animate")],
 } satisfies Config;
+
