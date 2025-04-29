@@ -3,6 +3,7 @@ import React from 'react';
 import { Button } from "@/components/ui/button";
 import { useNavigate } from 'react-router-dom';
 import { FileImage, InfoIcon, ArrowDown, Upload, Search, CheckCircle } from 'lucide-react';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 
 const Hero = () => {
   const navigate = useNavigate();
@@ -54,8 +55,8 @@ const Hero = () => {
             <div className="relative">
               <div className="bg-med-pink rounded-full w-80 h-80 opacity-20 absolute -top-10 -right-10 z-0"></div>
               <img 
-                src="https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=800"
-                alt="Technologie d'imagerie médicale" 
+                src="https://images.unsplash.com/photo-1559757175-5700dde675bc?auto=format&fit=crop&w=800"
+                alt="Médecin analysant une radiographie" 
                 className="rounded-2xl shadow-lg z-10 relative hover-scale"
               />
               <div className="bg-soft-gray rounded-full w-40 h-40 opacity-30 absolute -bottom-5 -left-5 z-0"></div>
@@ -63,7 +64,7 @@ const Hero = () => {
           </div>
         </div>
 
-        {/* Section Comment ça marche améliorée */}
+        {/* Section Comment ça marche améliorée avec Accordion */}
         <div id="how-it-works" className="mt-24 mb-12">
           <h2 className="text-3xl font-bold text-center mb-8">
             Comment <span className="text-med-pink">ça marche</span>
@@ -88,6 +89,20 @@ const Hero = () => {
               <div className="mt-4 flex justify-center">
                 <div className="w-16 h-1 bg-soft-pink"></div>
               </div>
+              
+              <Accordion type="single" collapsible className="w-full mt-4">
+                <AccordionItem value="details-upload">
+                  <AccordionTrigger className="text-sm text-med-pink">Voir plus de détails</AccordionTrigger>
+                  <AccordionContent>
+                    <ul className="text-sm text-med-gray list-disc pl-5 space-y-1">
+                      <li>Compatible avec différents formats d'images (JPG, PNG, DICOM)</li>
+                      <li>Glisser-déposer ou sélection de fichier</li>
+                      <li>Prévisualisation instantanée</li>
+                      <li>Chiffrement des données pour protéger votre vie privée</li>
+                    </ul>
+                  </AccordionContent>
+                </AccordionItem>
+              </Accordion>
             </div>
 
             {/* Étape 2 */}
@@ -105,6 +120,20 @@ const Hero = () => {
               <div className="mt-4 flex justify-center">
                 <div className="w-16 h-1 bg-soft-pink"></div>
               </div>
+              
+              <Accordion type="single" collapsible className="w-full mt-4">
+                <AccordionItem value="details-ai">
+                  <AccordionTrigger className="text-sm text-med-pink">Voir plus de détails</AccordionTrigger>
+                  <AccordionContent>
+                    <ul className="text-sm text-med-gray list-disc pl-5 space-y-1">
+                      <li>Réseaux neuronaux de deep learning entraînés sur plus de 100 000 images</li>
+                      <li>Détection des anomalies avec une précision jusqu'à 94%</li>
+                      <li>Analyse complète en moins de 30 secondes</li>
+                      <li>Algorithmes constamment mis à jour avec les dernières avancées</li>
+                    </ul>
+                  </AccordionContent>
+                </AccordionItem>
+              </Accordion>
             </div>
 
             {/* Étape 3 */}
@@ -122,6 +151,21 @@ const Hero = () => {
               <div className="mt-4 flex justify-center">
                 <div className="w-16 h-1 bg-soft-pink"></div>
               </div>
+              
+              <Accordion type="single" collapsible className="w-full mt-4">
+                <AccordionItem value="details-results">
+                  <AccordionTrigger className="text-sm text-med-pink">Voir plus de détails</AccordionTrigger>
+                  <AccordionContent>
+                    <ul className="text-sm text-med-gray list-disc pl-5 space-y-1">
+                      <li>Visualisation des zones d'anomalies potentielles</li>
+                      <li>Score de confiance pour chaque détection</li>
+                      <li>Recommandations personnalisées basées sur les résultats</li>
+                      <li>Options d'exportation du rapport (PDF, email)</li>
+                      <li>Historique et suivi des analyses précédentes</li>
+                    </ul>
+                  </AccordionContent>
+                </AccordionItem>
+              </Accordion>
             </div>
           </div>
 
@@ -129,16 +173,21 @@ const Hero = () => {
             <p className="text-lg font-medium mb-6">
               Notre technologie d'IA aide à identifier les anomalies potentielles avec une grande précision
             </p>
-            <div className="flex justify-center">
-              <iframe 
-                width="560" 
-                height="315" 
-                src="https://www.youtube.com/embed/dQw4w9WgXcQ" 
-                title="Comment fonctionne l'IA de détection médicale" 
-                className="rounded-xl shadow-lg"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                allowFullScreen>
-              </iframe>
+            <div className="max-w-3xl mx-auto bg-white rounded-xl shadow-sm p-6">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="bg-soft-pink bg-opacity-10 p-4 rounded-lg text-center">
+                  <h4 className="font-bold text-2xl text-med-pink">94%</h4>
+                  <p className="text-sm text-med-gray">Précision diagnostique</p>
+                </div>
+                <div className="bg-soft-pink bg-opacity-10 p-4 rounded-lg text-center">
+                  <h4 className="font-bold text-2xl text-med-pink">&lt;30s</h4>
+                  <p className="text-sm text-med-gray">Temps d'analyse</p>
+                </div>
+                <div className="bg-soft-pink bg-opacity-10 p-4 rounded-lg text-center">
+                  <h4 className="font-bold text-2xl text-med-pink">+100k</h4>
+                  <p className="text-sm text-med-gray">Images d'entraînement</p>
+                </div>
+              </div>
             </div>
           </div>
         </div>
