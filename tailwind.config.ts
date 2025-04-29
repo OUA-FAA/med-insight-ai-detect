@@ -63,12 +63,11 @@ export default {
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
 				},
-				// Nouvelle palette de couleurs
-				"soft-blue": "#D3E4FD",
-				"med-blue": "#70B3F8",  
-				"dark-blue": "#3A86FF",
-				"soft-green": "#E2F5E9",
-				"med-green": "#6CD0A8",
+				// Nouvelle palette de couleurs avec dominante rose
+				"soft-pink": "#F8BBD0",  
+				"med-pink": "#EC407A",  
+				"bright-pink": "#D81B60",
+				"dark-pink": "#AD1457",
 				"soft-gray": "#F1F0FB",
 				"med-gray": "#8A898C",
 				"dark-gray": "#333333",
@@ -122,4 +121,3 @@ export default {
 	},
 	plugins: [require("tailwindcss-animate")],
 } satisfies Config;
-

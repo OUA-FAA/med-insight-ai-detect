@@ -44,7 +44,7 @@ const Header = () => {
           onClick={handleLogoClick}
         >
           <h1 className="text-xl md:text-2xl font-bold text-dark-gray">
-            <span className="text-med-blue">Med</span>Insight AI
+            <span className="text-med-pink">Radia</span>Detect AI
           </h1>
         </div>
         
@@ -85,7 +85,7 @@ const Header = () => {
                   <Button 
                     variant="outline" 
                     size="sm" 
-                    className="border-med-blue text-dark-gray hover:bg-soft-blue hover:bg-opacity-20"
+                    className="border-med-pink text-dark-gray hover:bg-soft-pink hover:bg-opacity-20"
                     onClick={handleDashboardClick}
                   >
                     Tableau de bord
@@ -107,7 +107,7 @@ const Header = () => {
                 <Button 
                   variant="outline" 
                   size="sm" 
-                  className="border-med-blue text-dark-gray hover:bg-soft-blue hover:bg-opacity-20"
+                  className="border-med-pink text-dark-gray hover:bg-soft-pink hover:bg-opacity-20"
                   onClick={handleLoginClick}
                 >
                   Connexion
@@ -142,7 +142,7 @@ const Header = () => {
               href="#" 
               className={`px-2 py-2 rounded-md ${
                 location.pathname === '/' 
-                  ? 'bg-soft-blue text-dark-gray font-medium' 
+                  ? 'bg-soft-pink text-dark-gray font-medium' 
                   : 'text-med-gray hover:bg-soft-gray'
               }`}
               onClick={(e) => {

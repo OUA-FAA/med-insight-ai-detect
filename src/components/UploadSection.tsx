@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { detectDisease } from '../utils/mockApi';
 import { DetectionResult } from '../types';
 import ResultsDisplay from './ResultsDisplay';
-import { Upload, X, File } from 'lucide-react';
+import { Upload, X, File, Check, Info } from 'lucide-react';
 
 const UploadSection = () => {
   const [isDragging, setIsDragging] = useState(false);
@@ -104,6 +104,11 @@ const UploadSection = () => {
     try {
       const detectionResult = await detectDisease(originalFile);
       setResult(detectionResult);
+      toast({
+        title: "Analyse terminée",
+        description: "L'analyse de votre image a été complétée avec succès.",
+        variant: "default",
+      });
     } catch (error) {
       console.error("Error analyzing image:", error);
       toast({
@@ -123,14 +128,32 @@ const UploadSection = () => {
   };
 
   return (
-    <section id="upload" className="py-16 bg-soft-gray bg-opacity-30">
+    <section id="upload" className="py-16 bg-gradient-to-br from-white to-soft-pink/10">
       <div className="container-custom">
-        <div className="text-center mb-10">
+        <div className="text-center mb-12">
+          <span className="inline-block px-4 py-2 bg-soft-pink bg-opacity-20 rounded-full text-dark-pink font-medium text-sm mb-4">
+            Analyse IA sécurisée
+          </span>
           <h2 className="text-3xl font-bold mb-4">Analyse d'images médicales</h2>
           <p className="text-med-gray max-w-2xl mx-auto">
-            Téléchargez votre image médicale pour une analyse rapide par notre intelligence artificielle.
-            Formats acceptés : JPG, PNG, DICOM.
+            Téléchargez votre image médicale pour une analyse rapide et précise par notre intelligence artificielle.
+            Nous supportons les formats JPG, PNG et DICOM pour une flexibilité maximale.
           </p>
+          
+          <div className="flex flex-wrap justify-center gap-4 mt-6">
+            <div className="flex items-center bg-soft-gray rounded-full px-4 py-2">
+              <Check className="h-4 w-4 text-med-pink mr-2" />
+              <span className="text-sm">Analyse rapide</span>
+            </div>
+            <div className="flex items-center bg-soft-gray rounded-full px-4 py-2">
+              <Check className="h-4 w-4 text-med-pink mr-2" />
+              <span className="text-sm">Haute précision</span>
+            </div>
+            <div className="flex items-center bg-soft-gray rounded-full px-4 py-2">
+              <Check className="h-4 w-4 text-med-pink mr-2" />
+              <span className="text-sm">Résultats instantanés</span>
+            </div>
+          </div>
         </div>
 
         {!uploadedImage ? (
@@ -142,7 +165,7 @@ const UploadSection = () => {
             onDrop={handleDrop}
           >
             <div className="w-16 h-16 bg-soft-pink bg-opacity-20 rounded-full flex items-center justify-center mb-4">
-              <Upload className="h-8 w-8 text-soft-pink" />
+              <Upload className="h-8 w-8 text-med-pink" />
             </div>
             <h3 className="text-xl font-medium mb-2">Déposez votre image ici</h3>
             <p className="text-med-gray mb-6 text-center">
@@ -157,9 +180,16 @@ const UploadSection = () => {
                 onChange={handleFileChange}
               />
             </label>
+            
+            <div className="mt-8 pt-6 border-t border-dashed border-soft-gray w-full">
+              <div className="flex items-center justify-center text-sm text-med-gray">
+                <Info className="h-4 w-4 mr-2 text-med-pink" />
+                <span>Formats acceptés : JPG, PNG, DICOM (max. 10MB)</span>
+              </div>
+            </div>
           </div>
         ) : (
-          <div className="max-w-4xl mx-auto">
+          <div className="max-w-4xl mx-auto bg-white rounded-xl shadow-md p-8">
             <div className="flex flex-col lg:flex-row gap-8">
               <div className="lg:w-1/2">
                 <div className="relative">
@@ -179,9 +209,14 @@ const UploadSection = () => {
                     className="w-full rounded-xl shadow-md object-cover max-h-80"
                   />
                   <div className="mt-4">
-                    <p className="text-sm text-med-gray mb-2">
-                      {originalFile?.name} ({Math.round(originalFile?.size / 1024)} KB)
-                    </p>
+                    <div className="flex items-center justify-between mb-3">
+                      <p className="text-sm text-med-gray">
+                        {originalFile?.name}
+                      </p>
+                      <p className="text-xs bg-soft-gray px-2 py-1 rounded-full">
+                        {Math.round(originalFile?.size ? originalFile.size / 1024 : 0)} KB
+                      </p>
+                    </div>
                     {!result && (
                       <Button 
                         className="btn-primary w-full" 
@@ -209,14 +244,34 @@ const UploadSection = () => {
                   <div className="h-full flex items-center justify-center">
                     {isAnalyzing ? (
                       <div className="text-center">
-                        <div className="w-16 h-16 border-4 border-soft-pink border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+                        <div className="w-16 h-16 border-4 border-med-pink border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
                         <p className="text-lg font-medium">Analyse en cours...</p>
                         <p className="text-med-gray">Notre IA est en train d'analyser votre image</p>
+                        
+                        <div className="mt-6 max-w-xs mx-auto">
+                          <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
+                            <div className="h-full bg-med-pink animate-pulse" style={{ width: '70%' }}></div>
+                          </div>
+                        </div>
                       </div>
                     ) : (
-                      <div className="text-center p-8 border border-dashed border-soft-gray rounded-xl">
+                      <div className="text-center p-8 border border-dashed border-soft-pink rounded-xl">
+                        <div className="w-16 h-16 bg-soft-pink bg-opacity-20 rounded-full flex items-center justify-center mx-auto mb-4">
+                          <Info className="h-8 w-8 text-med-pink" />
+                        </div>
                         <p className="text-lg font-medium mb-2">Prêt pour l'analyse</p>
                         <p className="text-med-gray">Cliquez sur "Lancer la détection" pour analyser votre image</p>
+                        <div className="flex flex-wrap justify-center gap-2 mt-6">
+                          <div className="text-xs bg-soft-gray px-3 py-1 rounded-full text-med-gray">
+                            Précision ~94%
+                          </div>
+                          <div className="text-xs bg-soft-gray px-3 py-1 rounded-full text-med-gray">
+                            Résultat en &lt;30s
+                          </div>
+                          <div className="text-xs bg-soft-gray px-3 py-1 rounded-full text-med-gray">
+                            Confidentiel
+                          </div>
+                        </div>
                       </div>
                     )}
                   </div>

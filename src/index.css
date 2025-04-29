@@ -16,24 +16,24 @@
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
 
-    --primary: 210 100% 56%;
-    --primary-foreground: 210 100% 98%;
+    --primary: 336 83% 66%;
+    --primary-foreground: 336 100% 98%;
 
-    --secondary: 100 56% 92%;
-    --secondary-foreground: 100 20% 30%;
+    --secondary: 338 56% 92%;
+    --secondary-foreground: 338 20% 30%;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    --muted: 336 40% 96.1%;
+    --muted-foreground: 336 16.3% 46.9%;
 
-    --accent: 210 100% 56%;
-    --accent-foreground: 210 100% 98%;
+    --accent: 336 83% 66%;
+    --accent-foreground: 336 100% 98%;
 
     --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive-foreground: 336 40% 98%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 210 100% 56%;
+    --border: 336 31.8% 91.4%;
+    --input: 336 31.8% 91.4%;
+    --ring: 336 83% 66%;
 
     --radius: 0.75rem;
 
@@ -62,7 +62,7 @@
   }
   
   .btn-primary {
-    @apply px-6 py-3 bg-med-blue text-white font-medium rounded-lg hover:bg-dark-blue transition-all duration-300 flex items-center justify-center gap-2;
+    @apply px-6 py-3 bg-soft-pink text-white font-medium rounded-lg hover:bg-bright-pink transition-all duration-300 flex items-center justify-center gap-2;
   }
   
   .btn-secondary {
@@ -70,11 +70,11 @@
   }
   
   .upload-zone {
-    @apply border-2 border-dashed border-med-blue rounded-xl p-8 bg-soft-blue bg-opacity-10 flex flex-col items-center justify-center transition-all duration-300;
+    @apply border-2 border-dashed border-soft-pink rounded-xl p-8 bg-soft-pink bg-opacity-10 flex flex-col items-center justify-center transition-all duration-300;
   }
   
   .upload-zone-active {
-    @apply bg-soft-blue bg-opacity-20 border-primary;
+    @apply bg-soft-pink bg-opacity-20 border-primary;
   }
   
   .result-card {
@@ -86,7 +86,7 @@
   }
   
   .confidence-progress {
-    @apply h-full bg-med-blue transition-all duration-500 ease-out;
+    @apply h-full bg-soft-pink transition-all duration-500 ease-out;
   }
 
   /* Nouvelles classes pour les animations et interactions */
@@ -102,4 +102,3 @@
     @apply transition-colors duration-200;
   }
 }
-
