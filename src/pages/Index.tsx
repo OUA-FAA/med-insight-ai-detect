@@ -15,6 +15,11 @@ const Index = () => {
         <UploadSection />
       </main>
       <Footer />
+      
+      {/* This adds a floating button for easy access to How It Works */}
+      <div className="fixed bottom-4 right-4 md:bottom-8 md:right-8 z-10">
+        <HowItWorksDialog />
+      </div>
     </div>
   );
 };
