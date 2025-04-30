@@ -20,4 +20,13 @@ export type DetectionResult = {
     confidence?: number;
     classification?: string;
   }[];
+  metadata?: {
+    processingTime?: string;
+    analysisTechnique?: string;
+    detectionAlgorithm?: string;
+    aiModelVersion?: string;
+    detectionThreshold?: string;
+  };
+  cancerRiskScore?: number;
+  diagnosticNotes?: string;
 };
