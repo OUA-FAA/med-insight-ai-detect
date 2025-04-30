@@ -2,7 +2,7 @@
 import React from 'react';
 import { Button } from "@/components/ui/button";
 import { useNavigate } from 'react-router-dom';
-import { FileImage, InfoIcon, ArrowDown, Upload, Search, CheckCircle } from 'lucide-react';
+import { FileImage, InfoIcon, ArrowDown, Upload, Search, CheckCircle, FileText, Microscope } from 'lucide-react';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 
 const Hero = () => {
@@ -22,11 +22,11 @@ const Hero = () => {
           <div className="md:w-1/2 md:pr-12">
             <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4 leading-tight animate-fade-in">
               Détection assistée par IA
-              <span className="text-med-pink block"> pour l'imagerie médicale</span>
+              <span className="text-med-pink block"> pour le cancer du sein</span>
             </h1>
             <p className="text-med-gray text-lg mb-8 animate-slide-in">
               Notre technologie d'intelligence artificielle analyse vos images médicales pour aider 
-              à détecter des anomalies potentielles. Un outil d'assistance rapide et fiable pour les professionnels de santé.
+              à détecter des anomalies potentielles liées au cancer du sein. Un outil d'assistance rapide et fiable pour les professionnels de santé.
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
               <Button 
@@ -55,8 +55,8 @@ const Hero = () => {
             <div className="relative">
               <div className="bg-med-pink rounded-full w-80 h-80 opacity-20 absolute -top-10 -right-10 z-0"></div>
               <img 
-                src="https://images.unsplash.com/photo-1559757175-5700dde675bc?auto=format&fit=crop&w=800"
-                alt="Médecin analysant une radiographie" 
+                src="https://img.freepik.com/vecteurs-premium/mois-sensibilisation-au-cancer-du-sein-arriere-plan-cercle-lisse-rose-ruban-adhesif_88343-14192.jpg?semt=ais_hybrid&w=740"
+                alt="Sensibilisation au cancer du sein" 
                 className="rounded-2xl shadow-lg z-10 relative hover-scale"
               />
               <div className="bg-soft-gray rounded-full w-40 h-40 opacity-30 absolute -bottom-5 -left-5 z-0"></div>
@@ -84,7 +84,7 @@ const Hero = () => {
               </div>
               <h3 className="font-heading font-bold text-xl mb-3 text-center">Importez votre image</h3>
               <p className="text-med-gray text-center">
-                Téléchargez facilement vos images médicales par glisser-déposer ou en utilisant notre formulaire d'import.
+                Téléchargez facilement vos mammographies ou autres images liées au cancer du sein.
               </p>
               <div className="mt-4 flex justify-center">
                 <div className="w-16 h-1 bg-soft-pink"></div>
@@ -95,10 +95,10 @@ const Hero = () => {
                   <AccordionTrigger className="text-sm text-med-pink">Voir plus de détails</AccordionTrigger>
                   <AccordionContent>
                     <ul className="text-sm text-med-gray list-disc pl-5 space-y-1">
-                      <li>Compatible avec différents formats d'images (JPG, PNG, DICOM)</li>
-                      <li>Glisser-déposer ou sélection de fichier</li>
-                      <li>Prévisualisation instantanée</li>
+                      <li>Formats d'images acceptés: JPG, PNG, DICOM</li>
+                      <li>Types d'images: mammographies, échographies, IRM du sein</li>
                       <li>Chiffrement des données pour protéger votre vie privée</li>
+                      <li>Interface intuitive par glisser-déposer ou sélection de fichier</li>
                     </ul>
                   </AccordionContent>
                 </AccordionItem>
@@ -108,14 +108,14 @@ const Hero = () => {
             {/* Étape 2 */}
             <div className="bg-white p-8 rounded-xl shadow-sm card-hover relative md:mt-8">
               <div className="w-16 h-16 mx-auto bg-soft-pink rounded-full flex items-center justify-center mb-6">
-                <Search className="h-8 w-8 text-dark-pink" />
+                <Microscope className="h-8 w-8 text-dark-pink" />
                 <div className="absolute -top-4 -right-4 w-8 h-8 bg-med-pink rounded-full flex items-center justify-center text-white font-bold">
                   2
                 </div>
               </div>
-              <h3 className="font-heading font-bold text-xl mb-3 text-center">Analyse IA</h3>
+              <h3 className="font-heading font-bold text-xl mb-3 text-center">Analyse IA Spécialisée</h3>
               <p className="text-med-gray text-center">
-                Notre intelligence artificielle avancée analyse votre image à la recherche d'anomalies potentielles.
+                Notre IA spécialement entraînée pour la détection du cancer du sein analyse vos images médicales.
               </p>
               <div className="mt-4 flex justify-center">
                 <div className="w-16 h-1 bg-soft-pink"></div>
@@ -126,10 +126,11 @@ const Hero = () => {
                   <AccordionTrigger className="text-sm text-med-pink">Voir plus de détails</AccordionTrigger>
                   <AccordionContent>
                     <ul className="text-sm text-med-gray list-disc pl-5 space-y-1">
-                      <li>Réseaux neuronaux de deep learning entraînés sur plus de 100 000 images</li>
-                      <li>Détection des anomalies avec une précision jusqu'à 94%</li>
+                      <li>Réseaux neuronaux de deep learning spécialisés en oncologie</li>
+                      <li>Entraînés sur plus de 100 000 images de mammographies</li>
+                      <li>Détection des masses, calcifications et distorsions architecturales</li>
                       <li>Analyse complète en moins de 30 secondes</li>
-                      <li>Algorithmes constamment mis à jour avec les dernières avancées</li>
+                      <li>Modèle actualisé régulièrement avec les dernières avancées médicales</li>
                     </ul>
                   </AccordionContent>
                 </AccordionItem>
@@ -139,14 +140,14 @@ const Hero = () => {
             {/* Étape 3 */}
             <div className="bg-white p-8 rounded-xl shadow-sm card-hover relative">
               <div className="w-16 h-16 mx-auto bg-soft-pink rounded-full flex items-center justify-center mb-6">
-                <CheckCircle className="h-8 w-8 text-dark-pink" />
+                <FileText className="h-8 w-8 text-dark-pink" />
                 <div className="absolute -top-4 -right-4 w-8 h-8 bg-med-pink rounded-full flex items-center justify-center text-white font-bold">
                   3
                 </div>
               </div>
               <h3 className="font-heading font-bold text-xl mb-3 text-center">Résultats détaillés</h3>
               <p className="text-med-gray text-center">
-                Recevez un rapport complet avec la probabilité de détection et des recommandations médicales.
+                Recevez un rapport complet avec la probabilité de détection et des recommandations spécifiques.
               </p>
               <div className="mt-4 flex justify-center">
                 <div className="w-16 h-1 bg-soft-pink"></div>
@@ -157,11 +158,11 @@ const Hero = () => {
                   <AccordionTrigger className="text-sm text-med-pink">Voir plus de détails</AccordionTrigger>
                   <AccordionContent>
                     <ul className="text-sm text-med-gray list-disc pl-5 space-y-1">
-                      <li>Visualisation des zones d'anomalies potentielles</li>
-                      <li>Score de confiance pour chaque détection</li>
-                      <li>Recommandations personnalisées basées sur les résultats</li>
+                      <li>Visualisation précise des zones suspectes avec cartographie thermique</li>
+                      <li>Classification des anomalies selon les standards médicaux</li>
+                      <li>Score BI-RADS (Breast Imaging-Reporting and Data System)</li>
+                      <li>Recommandations personnalisées pour le suivi médical</li>
                       <li>Options d'exportation du rapport (PDF, email)</li>
-                      <li>Historique et suivi des analyses précédentes</li>
                     </ul>
                   </AccordionContent>
                 </AccordionItem>
@@ -171,12 +172,12 @@ const Hero = () => {
 
           <div className="mt-12 text-center">
             <p className="text-lg font-medium mb-6">
-              Notre technologie d'IA aide à identifier les anomalies potentielles avec une grande précision
+              Notre technologie d'IA aide à identifier les anomalies potentielles liées au cancer du sein avec une grande précision
             </p>
             <div className="max-w-3xl mx-auto bg-white rounded-xl shadow-sm p-6">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div className="bg-soft-pink bg-opacity-10 p-4 rounded-lg text-center">
-                  <h4 className="font-bold text-2xl text-med-pink">94%</h4>
+                  <h4 className="font-bold text-2xl text-med-pink">95%</h4>
                   <p className="text-sm text-med-gray">Précision diagnostique</p>
                 </div>
                 <div className="bg-soft-pink bg-opacity-10 p-4 rounded-lg text-center">
@@ -184,7 +185,7 @@ const Hero = () => {
                   <p className="text-sm text-med-gray">Temps d'analyse</p>
                 </div>
                 <div className="bg-soft-pink bg-opacity-10 p-4 rounded-lg text-center">
-                  <h4 className="font-bold text-2xl text-med-pink">+100k</h4>
+                  <h4 className="font-bold text-2xl text-med-pink">+150k</h4>
                   <p className="text-sm text-med-gray">Images d'entraînement</p>
                 </div>
               </div>

@@ -44,7 +44,7 @@ const Header = () => {
           onClick={handleLogoClick}
         >
           <h1 className="text-xl md:text-2xl font-bold text-dark-gray">
-            <span className="text-med-pink">Radia</span>Detect AI
+            <span className="text-med-pink">Radia</span>Cancer
           </h1>
         </div>
         
@@ -73,7 +73,10 @@ const Header = () => {
                 className="text-med-gray hover:text-dark-gray interactive-element"
                 onClick={(e) => {
                   e.preventDefault();
-                  // Navigation vers la section Comment ça marche
+                  const howItWorksSection = document.getElementById('how-it-works');
+                  if (howItWorksSection) {
+                    howItWorksSection.scrollIntoView({ behavior: 'smooth' });
+                  }
                 }}
               >
                 Comment ça marche
@@ -158,7 +161,10 @@ const Header = () => {
               className="px-2 py-2 rounded-md text-med-gray hover:bg-soft-gray"
               onClick={(e) => {
                 e.preventDefault();
-                // Navigation vers la section Comment ça marche
+                const howItWorksSection = document.getElementById('how-it-works');
+                if (howItWorksSection) {
+                  howItWorksSection.scrollIntoView({ behavior: 'smooth' });
+                }
                 setMobileMenuOpen(false);
               }}
             >

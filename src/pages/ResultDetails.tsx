@@ -13,14 +13,14 @@ const mockAnalysisDetails = {
   id: 1,
   date: '2025-04-25',
   time: '14:35',
-  imageType: 'Radiographie pulmonaire',
-  result: 'Aucune anomalie détectée',
-  confidence: 93.5,
-  recommendation: 'Continuez les examens de routine selon les recommandations de votre médecin. Un contrôle annuel est conseillé.',
-  imageSrc: 'https://images.unsplash.com/photo-1530026405186-ed1f139313f8?auto=format&fit=crop&w=800',
-  doctor: 'Dr. Martin Laurent',
-  hospital: 'Centre Hospitalier Universitaire',
-  notes: 'Image de bonne qualité, tous les indicateurs sont dans les normes attendues.'
+  imageType: 'Mammographie du sein droit',
+  result: 'Suspicion de lésion',
+  confidence: 87.5,
+  recommendation: 'Une biopsie est recommandée pour confirmer la nature de la lésion détectée. Veuillez consulter un oncologue spécialisé dans le cancer du sein dans les plus brefs délais.',
+  imageSrc: 'https://www.cancerresearchuk.org/sites/default/files/styles/cruk_wide_resp/public/mammogram-cruk.png.webp',
+  doctor: 'Dr. Sophie Laurent',
+  hospital: 'Centre d\'Oncologie',
+  notes: 'Image de qualité adéquate. La détection montre une masse potentielle de 1.2 cm dans le quadrant supérieur externe.'
 };
 
 const ResultDetails = () => {
@@ -68,6 +68,9 @@ const ResultDetails = () => {
                     alt={mockAnalysisDetails.imageType} 
                     className="w-full h-auto"
                   />
+                  <div className="absolute top-0 left-0 w-full h-full bg-med-pink bg-opacity-10 pointer-events-none">
+                    <div className="absolute top-1/3 left-1/4 w-16 h-16 rounded-full border-2 border-red-500 animate-pulse"></div>
+                  </div>
                 </div>
                 <CardContent className="p-6">
                   <div className="flex justify-between items-center mb-4">
@@ -120,7 +123,7 @@ const ResultDetails = () => {
                 <CardContent className="p-6">
                   <div className="mb-6">
                     <h3 className="font-medium text-med-gray mb-1">Résultat de l'analyse</h3>
-                    <h2 className="text-2xl font-bold">{mockAnalysisDetails.result}</h2>
+                    <h2 className="text-2xl font-bold text-med-pink">{mockAnalysisDetails.result}</h2>
                   </div>
 
                   <div className="mb-6">
@@ -128,9 +131,9 @@ const ResultDetails = () => {
                       <h3 className="font-medium text-med-gray">Niveau de confiance</h3>
                       <span className="font-bold">{mockAnalysisDetails.confidence.toFixed(1)}%</span>
                     </div>
-                    <div className="confidence-bar">
+                    <div className="bg-gray-200 h-2 rounded-full overflow-hidden">
                       <div 
-                        className="confidence-progress" 
+                        className="bg-med-pink h-full rounded-full" 
                         style={{ width: `${mockAnalysisDetails.confidence}%` }}
                       ></div>
                     </div>
@@ -141,14 +144,14 @@ const ResultDetails = () => {
                     </div>
                   </div>
 
-                  <div className="p-4 bg-soft-blue bg-opacity-10 rounded-lg border border-med-blue border-opacity-20 mb-6">
-                    <h3 className="font-medium mb-2">Recommandation</h3>
+                  <div className="p-4 bg-soft-pink bg-opacity-20 rounded-lg border border-med-pink border-opacity-20 mb-6">
+                    <h3 className="font-medium mb-2 text-med-pink">Recommandation</h3>
                     <p className="text-sm">{mockAnalysisDetails.recommendation}</p>
                   </div>
 
                   <div className="pt-4 border-t border-soft-gray">
                     <p className="text-med-gray text-sm italic">
-                      <strong>Important :</strong> Ce résultat est généré par une intelligence artificielle et ne constitue pas un diagnostic médical. 
+                      <strong>Important :</strong> Ce résultat est généré par une intelligence artificielle et ne constitue pas un diagnostic médical définitif. 
                       Consultez toujours un professionnel de santé qualifié pour une évaluation complète.
                     </p>
                   </div>
@@ -156,7 +159,7 @@ const ResultDetails = () => {
               </Card>
               
               <div className="mt-6">
-                <Button className="w-full" onClick={() => navigate('/')}>
+                <Button className="w-full bg-med-pink hover:bg-dark-pink" onClick={() => navigate('/')}>
                   Nouvelle analyse
                 </Button>
               </div>
