@@ -44,7 +44,7 @@ const Header = () => {
           onClick={handleLogoClick}
         >
           <h1 className="text-xl md:text-2xl font-bold text-dark-gray">
-            <span className="text-med-pink">Radia</span>Cancer
+            <span className="text-med-pink">Med</span>Cancer
           </h1>
         </div>
         
