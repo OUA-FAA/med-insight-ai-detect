@@ -2,15 +2,22 @@
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Menu, X } from 'lucide-react';
+import { Menu, X, LogOut, User } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 const Header = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
-
-  // Mock auth state (in a real app, this would come from an auth context)
-  const isLoggedIn = location.pathname === '/dashboard' || location.pathname.includes('/results');
+  const { user, signOut, profile } = useAuth();
 
   const toggleMobileMenu = () => {
     setMobileMenuOpen(!mobileMenuOpen);
@@ -31,10 +38,15 @@ const Header = () => {
     navigate('/dashboard');
   };
 
-  // Déconnexion (simulée)
-  const handleLogoutClick = () => {
+  // Déconnexion
+  const handleLogoutClick = async () => {
+    await signOut();
     navigate('/');
   };
+
+  const displayName = profile?.first_name 
+    ? `${profile.first_name}${profile.last_name ? ' ' + profile.last_name[0] + '.' : ''}`
+    : user?.email?.split('@')[0];
 
   return (
     <header className="bg-white shadow-sm py-4 sticky top-0 z-50">
@@ -76,13 +88,15 @@ const Header = () => {
                   const howItWorksSection = document.getElementById('how-it-works');
                   if (howItWorksSection) {
                     howItWorksSection.scrollIntoView({ behavior: 'smooth' });
+                  } else {
+                    navigate('/#how-it-works');
                   }
                 }}
               >
                 Comment ça marche
               </a>
             </li>
-            {isLoggedIn ? (
+            {user ? (
               <>
                 <li>
                   <Button 
@@ -95,14 +109,24 @@ const Header = () => {
                   </Button>
                 </li>
                 <li>
-                  <Button 
-                    variant="ghost" 
-                    size="sm" 
-                    className="text-med-gray hover:text-dark-gray"
-                    onClick={handleLogoutClick}
-                  >
-                    Déconnexion
-                  </Button>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" size="sm" className="text-med-gray hover:text-dark-gray">
+                        <User className="h-4 w-4 mr-1" /> {displayName}
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuLabel>Mon compte</DropdownMenuLabel>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem onClick={handleDashboardClick}>
+                        Tableau de bord
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={handleLogoutClick}>
+                        <LogOut className="h-4 w-4 mr-2" />
+                        Déconnexion
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </li>
               </>
             ) : (
@@ -164,13 +188,15 @@ const Header = () => {
                 const howItWorksSection = document.getElementById('how-it-works');
                 if (howItWorksSection) {
                   howItWorksSection.scrollIntoView({ behavior: 'smooth' });
+                } else {
+                  navigate('/#how-it-works');
                 }
                 setMobileMenuOpen(false);
               }}
             >
               Comment ça marche
             </a>
-            {isLoggedIn ? (
+            {user ? (
               <>
                 <a 
                   href="#" 
@@ -183,16 +209,20 @@ const Header = () => {
                 >
                   Tableau de bord
                 </a>
+                <div className="border-t border-soft-gray my-2"></div>
+                <div className="px-2 py-2 text-sm text-med-gray">
+                  Connecté en tant que: {displayName}
+                </div>
                 <a 
                   href="#" 
-                  className="px-2 py-2 rounded-md text-med-gray hover:bg-soft-gray"
+                  className="px-2 py-2 rounded-md text-med-gray hover:bg-soft-gray flex items-center"
                   onClick={(e) => {
                     e.preventDefault();
-                    navigate('/');
+                    handleLogoutClick();
                     setMobileMenuOpen(false);
                   }}
                 >
-                  Déconnexion
+                  <LogOut className="h-4 w-4 mr-2" /> Déconnexion
                 </a>
               </>
             ) : (

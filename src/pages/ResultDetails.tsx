@@ -1,383 +1,388 @@
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { ArrowLeft, Download, Calendar, Clock, FileImage, AlertCircle, CheckCircle2, Loader2 } from 'lucide-react';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import { useToast } from "@/components/ui/use-toast";
-import { Download, Mail, ChevronLeft, Calendar, Clock, FileImage, AlertCircle, Info, Check, X } from 'lucide-react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-
-// Simulons des données détaillées pour une analyse
-const mockAnalysisDetails = {
-  id: 1,
-  date: '2025-04-25',
-  time: '14:35',
-  imageType: 'Mammographie du sein droit',
-  result: 'Suspicion de lésion',
-  confidence: 87.5,
-  recommendation: 'Une biopsie est recommandée pour confirmer la nature de la lésion détectée. Veuillez consulter un oncologue spécialisé dans le cancer du sein dans les plus brefs délais.',
-  imageSrc: 'https://www.cancerresearchuk.org/sites/default/files/styles/cruk_wide_resp/public/mammogram-cruk.png.webp',
-  doctor: 'Dr. Sophie Laurent',
-  hospital: 'Centre d\'Oncologie',
-  notes: 'Image de qualité adéquate. La détection montre une masse potentielle de 1.2 cm dans le quadrant supérieur externe.',
-  resolution: '3000 x 2400 px',
-  format: 'DICOM',
-  tissues: 'Tissu mammaire, quadrant supérieur externe',
-  sensitivity: '97%',
-  specificity: '94%',
-  accuracy: '95%',
-  areas: [
-    {
-      x: 1480,
-      y: 920,
-      width: 120,
-      height: 85,
-      size: '1.2 cm',
-      description: 'Masse hyperdense irrégulière avec bords mal définis',
-      confidence: 91.3,
-      classification: 'BI-RADS 4C'
-    },
-    {
-      x: 1350,
-      y: 850,
-      width: 65,
-      height: 60,
-      size: '0.7 cm',
-      description: 'Microcalcifications groupées avec distribution hétérogène',
-      confidence: 84.8,
-      classification: 'BI-RADS 4A'
-    }
-  ],
-  medicalHistory: 'Antécédents familiaux de cancer du sein (mère). Pas de mammographies anormales antérieures.',
-  additionalNotes: 'La densité mammaire est de catégorie C (hétérogène), ce qui peut limiter la sensibilité de la mammographie. Une échographie complémentaire est recommandée.'
-};
+import { useAuth } from '@/contexts/AuthContext';
+import { AnalysisResult } from '@/types';
+import { getAnalysisResultById } from '@/services/analysisService';
 
 const ResultDetails = () => {
-  const { id } = useParams();
+  const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { user } = useAuth();
+  const [result, setResult] = useState<AnalysisResult | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
-  // En production, nous récupèrerions les données avec l'ID
-  // Pour l'instant, utilisons les données mockées
-  
-  const handleExportPDF = () => {
-    toast({
-      title: "Export PDF",
-      description: "Le rapport a été téléchargé avec succès",
+  useEffect(() => {
+    const fetchResult = async () => {
+      if (!id || !user) return;
+
+      try {
+        setIsLoading(true);
+        const data = await getAnalysisResultById(id);
+        
+        if (!data) {
+          toast({
+            title: "Résultat non trouvé",
+            description: "Le résultat demandé n'existe pas ou vous n'avez pas les droits pour y accéder",
+            variant: "destructive",
+          });
+          navigate('/dashboard');
+          return;
+        }
+
+        // Check if this result belongs to the current user
+        if (data.user_id !== user.id) {
+          toast({
+            title: "Accès refusé",
+            description: "Vous n'avez pas les droits pour accéder à ce résultat",
+            variant: "destructive",
+          });
+          navigate('/dashboard');
+          return;
+        }
+
+        setResult(data);
+      } catch (error) {
+        console.error("Error fetching result:", error);
+        toast({
+          title: "Erreur",
+          description: "Impossible de charger les détails de l'analyse",
+          variant: "destructive",
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchResult();
+  }, [id, user, navigate, toast]);
+
+  // Function to format date from ISO string
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('fr-FR', { 
+      year: 'numeric', 
+      month: 'long', 
+      day: 'numeric' 
     });
   };
-  
-  const handleSendEmail = () => {
-    toast({
-      title: "Email envoyé",
-      description: "Le rapport a été envoyé à votre adresse email",
+
+  // Function to format time from ISO string
+  const formatTime = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleTimeString('fr-FR', { 
+      hour: '2-digit', 
+      minute: '2-digit' 
     });
   };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex flex-col">
+        <Header />
+        <main className="flex-grow flex items-center justify-center">
+          <div className="text-center">
+            <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-med-blue" />
+            <p className="text-med-gray">Chargement des détails de l'analyse...</p>
+          </div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+
+  if (!result) {
+    return (
+      <div className="min-h-screen flex flex-col">
+        <Header />
+        <main className="flex-grow py-12 container-custom">
+          <div className="max-w-2xl mx-auto text-center bg-soft-gray p-10 rounded-lg">
+            <AlertCircle className="h-16 w-16 text-destructive mx-auto mb-6" />
+            <h1 className="text-2xl font-bold mb-4">Résultat non trouvé</h1>
+            <p className="mb-6 text-med-gray">Le résultat d'analyse que vous recherchez n'existe pas ou vous n'avez pas les permissions pour y accéder.</p>
+            <Button onClick={() => navigate('/dashboard')}>
+              <ArrowLeft className="h-4 w-4 mr-2" /> Retour au tableau de bord
+            </Button>
+          </div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+
+  const isAnomalyDetected = result.prediction.toLowerCase().includes('anomalie') || 
+                           result.prediction.toLowerCase().includes('suspect');
 
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
-      <main className="flex-grow bg-soft-gray bg-opacity-30 py-8">
+      <main className="flex-grow py-8 bg-soft-gray bg-opacity-30">
         <div className="container-custom">
-          <Button 
-            variant="ghost" 
-            className="mb-6 hover:bg-transparent pl-0" 
-            onClick={() => navigate('/dashboard')}
-          >
-            <ChevronLeft className="mr-1 h-4 w-4" />
-            Retour au tableau de bord
-          </Button>
+          {/* Navigation */}
+          <div className="mb-6">
+            <Button 
+              variant="ghost" 
+              className="pl-0" 
+              onClick={() => navigate('/dashboard')}
+            >
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Retour au tableau de bord
+            </Button>
+          </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            {/* Colonne de gauche - Image et détails principaux */}
             <div className="lg:col-span-2">
-              <Card className="overflow-hidden mb-6 animate-fade-in">
-                <Tabs defaultValue="image" className="w-full">
-                  <div className="px-6 pt-6">
-                    <TabsList className="mb-4">
-                      <TabsTrigger value="image">Image</TabsTrigger>
-                      <TabsTrigger value="details">Détails techniques</TabsTrigger>
-                      <TabsTrigger value="history">Antécédents</TabsTrigger>
-                    </TabsList>
-                  </div>
-                  
-                  <TabsContent value="image" className="mt-0">
-                    <div className="relative">
-                      <img 
-                        src={mockAnalysisDetails.imageSrc} 
-                        alt={mockAnalysisDetails.imageType} 
-                        className="w-full h-auto"
-                      />
-                      <div className="absolute top-0 left-0 w-full h-full bg-med-pink bg-opacity-10 pointer-events-none">
-                        {mockAnalysisDetails.areas.map((area, index) => (
-                          <div 
-                            key={index} 
-                            className="absolute border-2 border-red-500 animate-pulse rounded-full flex items-center justify-center"
-                            style={{ 
-                              left: `${area.x/30}px`, 
-                              top: `${area.y/30}px`, 
-                              width: `${area.width/3}px`, 
-                              height: `${area.height/3}px` 
-                            }}
-                          >
-                            <span className="bg-red-500 text-white text-xs px-1 rounded-full absolute -top-6">
-                              {index + 1}
-                            </span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                    <CardContent className="p-6">
-                      <div className="flex justify-between items-center mb-4">
-                        <h1 className="text-xl font-bold">{mockAnalysisDetails.imageType}</h1>
-                        <div className="flex space-x-2">
-                          <Button variant="outline" size="sm" onClick={handleExportPDF}>
-                            <Download className="mr-2 h-4 w-4" />
-                            PDF
-                          </Button>
-                          <Button variant="outline" size="sm" onClick={handleSendEmail}>
-                            <Mail className="mr-2 h-4 w-4" />
-                            Email
-                          </Button>
-                        </div>
-                      </div>
-                      
-                      <div className="flex flex-wrap gap-4 text-sm text-med-gray mb-6">
-                        <div className="flex items-center">
-                          <Calendar className="h-4 w-4 mr-1" />
-                          {mockAnalysisDetails.date.split('-').reverse().join('/')}
-                        </div>
-                        <div className="flex items-center">
-                          <Clock className="h-4 w-4 mr-1" />
-                          {mockAnalysisDetails.time}
-                        </div>
-                        <div className="flex items-center">
-                          <FileImage className="h-4 w-4 mr-1" />
-                          {mockAnalysisDetails.format}
-                        </div>
-                      </div>
-                      
-                      <div className="mb-6">
-                        <h3 className="font-medium text-med-gray mb-1">Information</h3>
-                        <p className="text-sm">{mockAnalysisDetails.notes}</p>
-                      </div>
-                      
-                      <div className="border-t border-soft-gray pt-4">
-                        <div className="flex items-start gap-3">
-                          <div className="w-8 h-8 rounded-full bg-soft-blue flex items-center justify-center flex-shrink-0 mt-1">
-                            <span className="text-dark-blue text-sm font-bold">Dr</span>
-                          </div>
-                          <div>
-                            <p className="font-medium">{mockAnalysisDetails.doctor}</p>
-                            <p className="text-sm text-med-gray">{mockAnalysisDetails.hospital}</p>
-                          </div>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </TabsContent>
-                  
-                  <TabsContent value="details" className="mt-0 p-6">
-                    <div className="space-y-6">
-                      <div>
-                        <h3 className="text-lg font-medium mb-3">Spécifications de l'image</h3>
-                        <div className="grid grid-cols-2 gap-4">
-                          <div className="bg-soft-gray/30 p-3 rounded-lg">
-                            <span className="text-sm text-med-gray">Résolution</span>
-                            <p className="font-medium">{mockAnalysisDetails.resolution}</p>
-                          </div>
-                          <div className="bg-soft-gray/30 p-3 rounded-lg">
-                            <span className="text-sm text-med-gray">Format</span>
-                            <p className="font-medium">{mockAnalysisDetails.format}</p>
-                          </div>
-                          <div className="bg-soft-gray/30 p-3 rounded-lg">
-                            <span className="text-sm text-med-gray">Type d'examen</span>
-                            <p className="font-medium">Mammographie</p>
-                          </div>
-                          <div className="bg-soft-gray/30 p-3 rounded-lg">
-                            <span className="text-sm text-med-gray">Tissus analysés</span>
-                            <p className="font-medium">{mockAnalysisDetails.tissues}</p>
-                          </div>
-                        </div>
-                      </div>
-                      
-                      <div>
-                        <h3 className="text-lg font-medium mb-3">Zones d'anomalies détectées</h3>
-                        <div className="space-y-4">
-                          {mockAnalysisDetails.areas.map((area, index) => (
-                            <div key={index} className="bg-soft-pink/10 p-4 rounded-lg border-l-2 border-med-pink">
-                              <div className="flex justify-between mb-2">
-                                <span className="font-medium">Anomalie {index + 1}</span>
-                                <span className="bg-med-pink/20 text-med-pink px-2 py-0.5 rounded-full text-xs">
-                                  Confiance: {area.confidence}%
-                                </span>
-                              </div>
-                              <div className="grid grid-cols-2 gap-2 mb-2">
-                                <div className="text-sm">
-                                  <span className="text-med-gray">Taille:</span> {area.size}
-                                </div>
-                                <div className="text-sm">
-                                  <span className="text-med-gray">Classification:</span> {area.classification}
-                                </div>
-                              </div>
-                              <p className="text-sm">{area.description}</p>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                      
-                      <div>
-                        <h3 className="text-lg font-medium mb-3">Métriques d'analyse</h3>
-                        <div className="flex gap-4">
-                          <div className="bg-white shadow-sm rounded-lg p-4 flex-1 text-center">
-                            <h4 className="text-sm text-med-gray">Sensibilité</h4>
-                            <p className="text-2xl font-bold text-med-pink">{mockAnalysisDetails.sensitivity}</p>
-                          </div>
-                          <div className="bg-white shadow-sm rounded-lg p-4 flex-1 text-center">
-                            <h4 className="text-sm text-med-gray">Spécificité</h4>
-                            <p className="text-2xl font-bold text-med-pink">{mockAnalysisDetails.specificity}</p>
-                          </div>
-                          <div className="bg-white shadow-sm rounded-lg p-4 flex-1 text-center">
-                            <h4 className="text-sm text-med-gray">Précision</h4>
-                            <p className="text-2xl font-bold text-med-pink">{mockAnalysisDetails.accuracy}</p>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </TabsContent>
-                  
-                  <TabsContent value="history" className="mt-0 p-6">
-                    <div className="space-y-6">
-                      <div>
-                        <h3 className="text-lg font-medium mb-3">Antécédents médicaux</h3>
-                        <p className="mb-4">{mockAnalysisDetails.medicalHistory}</p>
-                        
-                        <div className="bg-soft-gray/30 p-4 rounded-lg">
-                          <h4 className="font-medium mb-2">Notes supplémentaires</h4>
-                          <p className="text-sm">{mockAnalysisDetails.additionalNotes}</p>
-                        </div>
-                      </div>
-                      
-                      <div>
-                        <h3 className="text-lg font-medium mb-3">Liste des examens précédents</h3>
-                        <div className="border rounded-lg overflow-hidden">
-                          <div className="bg-soft-gray/50 px-4 py-2 text-sm font-medium grid grid-cols-12">
-                            <div className="col-span-2">Date</div>
-                            <div className="col-span-3">Type</div>
-                            <div className="col-span-4">Résultat</div>
-                            <div className="col-span-3">Médecin</div>
-                          </div>
-                          <div className="divide-y">
-                            <div className="px-4 py-3 text-sm grid grid-cols-12 hover:bg-soft-gray/20">
-                              <div className="col-span-2">15/12/2024</div>
-                              <div className="col-span-3">Mammographie</div>
-                              <div className="col-span-4 flex items-center">
-                                <span className="inline-flex items-center">
-                                  <Check className="h-3 w-3 mr-1 text-green-500" />
-                                  Normal
-                                </span>
-                              </div>
-                              <div className="col-span-3">Dr. Laurent</div>
-                            </div>
-                            <div className="px-4 py-3 text-sm grid grid-cols-12 hover:bg-soft-gray/20">
-                              <div className="col-span-2">03/06/2024</div>
-                              <div className="col-span-3">Échographie</div>
-                              <div className="col-span-4 flex items-center">
-                                <span className="inline-flex items-center">
-                                  <Check className="h-3 w-3 mr-1 text-green-500" />
-                                  Normal
-                                </span>
-                              </div>
-                              <div className="col-span-3">Dr. Moreau</div>
-                            </div>
-                            <div className="px-4 py-3 text-sm grid grid-cols-12 hover:bg-soft-gray/20">
-                              <div className="col-span-2">10/01/2024</div>
-                              <div className="col-span-3">IRM</div>
-                              <div className="col-span-4 flex items-center">
-                                <span className="inline-flex items-center">
-                                  <X className="h-3 w-3 mr-1 text-amber-500" />
-                                  Inconclusif
-                                </span>
-                              </div>
-                              <div className="col-span-3">Dr. Bernard</div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </TabsContent>
-                </Tabs>
-              </Card>
-            </div>
+              {/* En-tête avec titre */}
+              <div className="mb-6">
+                <h1 className="text-2xl md:text-3xl font-bold mb-2">Résultat d'analyse</h1>
+                <div className="flex items-center text-med-gray">
+                  <Calendar className="h-4 w-4 mr-1" /> 
+                  {formatDate(result.created_at)}
+                  <Clock className="h-4 w-4 ml-3 mr-1" /> 
+                  {formatTime(result.created_at)}
+                </div>
+              </div>
 
-            <div className="lg:col-span-1">
-              <Card className="animate-fade-in">
+              {/* Card de l'image */}
+              <Card className="mb-6">
                 <CardContent className="p-6">
-                  <div className="mb-6">
-                    <h3 className="font-medium text-med-gray mb-1">Résultat de l'analyse</h3>
-                    <h2 className="text-2xl font-bold text-med-pink">{mockAnalysisDetails.result}</h2>
-                  </div>
-
-                  <div className="mb-6">
-                    <div className="flex justify-between items-center mb-2">
-                      <h3 className="font-medium text-med-gray">Niveau de confiance</h3>
-                      <span className="font-bold">{mockAnalysisDetails.confidence.toFixed(1)}%</span>
-                    </div>
-                    <div className="bg-gray-200 h-2 rounded-full overflow-hidden">
-                      <div 
-                        className="bg-med-pink h-full rounded-full" 
-                        style={{ width: `${mockAnalysisDetails.confidence}%` }}
-                      ></div>
-                    </div>
-                    <div className="flex justify-between text-xs text-med-gray mt-1">
-                      <span>0%</span>
-                      <span>50%</span>
-                      <span>100%</span>
-                    </div>
-                  </div>
-
-                  <div className="space-y-3 mb-6">
-                    {mockAnalysisDetails.areas.map((area, index) => (
-                      <div key={index} className="flex items-center bg-soft-pink/10 px-3 py-2 rounded-lg">
-                        <div className="w-5 h-5 rounded-full bg-med-pink text-white flex items-center justify-center text-xs mr-2">
-                          {index + 1}
-                        </div>
-                        <div className="flex-grow overflow-hidden">
-                          <div className="truncate text-sm font-medium">{area.classification}</div>
-                          <div className="text-xs text-med-gray truncate">{area.description.substring(0, 30)}...</div>
-                        </div>
-                        <span className="text-xs bg-med-pink/20 text-med-pink px-1.5 py-0.5 rounded-full ml-1">
-                          {area.confidence}%
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-
-                  <div className="p-4 bg-soft-pink bg-opacity-20 rounded-lg border border-med-pink border-opacity-20 mb-6">
-                    <h3 className="font-medium mb-2 text-med-pink flex items-center">
-                      <AlertCircle className="h-4 w-4 mr-2" />
-                      Recommandation
-                    </h3>
-                    <p className="text-sm">{mockAnalysisDetails.recommendation}</p>
-                  </div>
-
-                  <div className="pt-4 border-t border-soft-gray">
-                    <p className="text-med-gray text-sm italic flex items-start">
-                      <Info className="h-4 w-4 mr-2 flex-shrink-0 mt-0.5" />
-                      <span>
-                        <strong>Important :</strong> Ce résultat est généré par une intelligence artificielle et ne constitue pas un diagnostic médical définitif. 
-                        Consultez toujours un professionnel de santé qualifié pour une évaluation complète.
-                      </span>
-                    </p>
+                  <div className="relative rounded-md overflow-hidden">
+                    <img 
+                      src={result.image_url} 
+                      alt={result.image_type || "Image médicale"} 
+                      className="w-full h-auto max-h-96 object-contain"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1530026405186-ed1f139313f8?auto=format&fit=crop&w=800';
+                      }}
+                    />
+                    {result.areas && result.areas.length > 0 && (
+                      <svg className="absolute top-0 left-0 w-full h-full">
+                        {result.areas.map((area, index) => (
+                          <rect
+                            key={index}
+                            x={`${area.x}%`}
+                            y={`${area.y}%`}
+                            width={`${area.width}%`}
+                            height={`${area.height}%`}
+                            className={`${
+                              isAnomalyDetected ? 'stroke-destructive' : 'stroke-emerald-500'
+                            } stroke-2 fill-transparent`}
+                          />
+                        ))}
+                      </svg>
+                    )}
                   </div>
                 </CardContent>
               </Card>
-              
-              <div className="mt-6">
-                <Button className="w-full bg-med-pink hover:bg-dark-pink" onClick={() => navigate('/')}>
-                  Nouvelle analyse
-                </Button>
-              </div>
+
+              {/* Résultat principal */}
+              <Card className={`mb-6 border-l-4 ${
+                isAnomalyDetected ? 'border-l-destructive' : 'border-l-emerald-500'
+              }`}>
+                <CardContent className="p-6">
+                  <div className="flex items-start gap-4">
+                    {isAnomalyDetected ? (
+                      <div className="rounded-full bg-destructive/10 p-2">
+                        <AlertCircle className="h-8 w-8 text-destructive" />
+                      </div>
+                    ) : (
+                      <div className="rounded-full bg-emerald-100 p-2">
+                        <CheckCircle2 className="h-8 w-8 text-emerald-500" />
+                      </div>
+                    )}
+                    <div>
+                      <h3 className={`text-xl font-bold mb-2 ${
+                        isAnomalyDetected ? 'text-destructive' : 'text-emerald-700'
+                      }`}>{result.prediction}</h3>
+                      <p className="text-med-gray mb-4">{result.recommendation}</p>
+                      <div className={`inline-flex items-center px-3 py-1 rounded-full text-sm ${
+                        isAnomalyDetected ? 
+                          'bg-red-100 text-destructive' : 
+                          'bg-green-100 text-emerald-700'
+                      }`}>
+                        <span className="font-medium mr-1">Confiance:</span> {result.confidence.toFixed(1)}%
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Zones détectées */}
+              {result.areas && result.areas.length > 0 && (
+                <Card className="mb-6">
+                  <CardHeader>
+                    <CardTitle className="text-lg">Zones détectées</CardTitle>
+                  </CardHeader>
+                  <CardContent className="p-6">
+                    <div className="space-y-4">
+                      {result.areas.map((area, index) => (
+                        <div key={index} className="flex items-start gap-3 p-3 rounded-lg bg-gray-50">
+                          <div className="h-6 w-6 rounded-full bg-gray-200 flex items-center justify-center text-sm font-medium">
+                            {index + 1}
+                          </div>
+                          <div>
+                            <div className="font-medium">{area.classification || `Zone ${index + 1}`}</div>
+                            <div className="text-sm text-med-gray">{area.description || 'Aucune description disponible'}</div>
+                            <div className="mt-1 text-xs text-med-gray">
+                              {area.confidence && (
+                                <span className="inline-block mr-3">
+                                  Confiance: {area.confidence.toFixed(1)}%
+                                </span>
+                              )}
+                              {area.size && (
+                                <span className="inline-block">
+                                  Taille: {area.size}
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+            </div>
+
+            {/* Colonne de droite - Informations supplémentaires */}
+            <div>
+              {/* Actions */}
+              <Card className="mb-6">
+                <CardContent className="p-6">
+                  <Button className="w-full mb-3" onClick={() => {
+                    toast({
+                      title: "Export PDF",
+                      description: "La fonctionnalité d'export en PDF sera bientôt disponible",
+                    });
+                  }}>
+                    <Download className="mr-2 h-4 w-4" /> Télécharger le rapport
+                  </Button>
+                  <Button variant="outline" className="w-full" onClick={() => navigate('/')}>
+                    <FileImage className="mr-2 h-4 w-4" /> Nouvelle analyse
+                  </Button>
+                </CardContent>
+              </Card>
+
+              {/* Informations de l'image */}
+              <Card className="mb-6">
+                <CardHeader>
+                  <CardTitle className="text-lg">Informations de l'image</CardTitle>
+                </CardHeader>
+                <CardContent className="p-6">
+                  <dl className="space-y-2">
+                    <div>
+                      <dt className="text-sm text-med-gray">Type d'image</dt>
+                      <dd className="font-medium">{result.image_type || 'Non spécifié'}</dd>
+                    </div>
+                    <div>
+                      <dt className="text-sm text-med-gray">Format</dt>
+                      <dd className="font-medium">{result.format || 'Non spécifié'}</dd>
+                    </div>
+                    <div>
+                      <dt className="text-sm text-med-gray">Résolution</dt>
+                      <dd className="font-medium">{result.resolution || 'Non spécifié'}</dd>
+                    </div>
+                    {result.tissues && (
+                      <div>
+                        <dt className="text-sm text-med-gray">Tissus concernés</dt>
+                        <dd className="font-medium">{result.tissues}</dd>
+                      </div>
+                    )}
+                  </dl>
+                </CardContent>
+              </Card>
+
+              {/* Indicateurs de performance */}
+              <Card className="mb-6">
+                <CardHeader>
+                  <CardTitle className="text-lg">Indicateurs de performance</CardTitle>
+                </CardHeader>
+                <CardContent className="p-6">
+                  <dl className="space-y-2">
+                    {result.sensitivity && (
+                      <div>
+                        <dt className="text-sm text-med-gray">Sensibilité</dt>
+                        <dd className="font-medium">{result.sensitivity}</dd>
+                      </div>
+                    )}
+                    {result.specificity && (
+                      <div>
+                        <dt className="text-sm text-med-gray">Spécificité</dt>
+                        <dd className="font-medium">{result.specificity}</dd>
+                      </div>
+                    )}
+                    {result.accuracy && (
+                      <div>
+                        <dt className="text-sm text-med-gray">Précision</dt>
+                        <dd className="font-medium">{result.accuracy}</dd>
+                      </div>
+                    )}
+                    {result.cancer_risk_score !== null && (
+                      <div>
+                        <dt className="text-sm text-med-gray">Score de risque</dt>
+                        <dd className="font-medium">{result.cancer_risk_score.toFixed(1)}/10</dd>
+                      </div>
+                    )}
+                  </dl>
+                </CardContent>
+              </Card>
+
+              {/* Notes diagnostiques */}
+              {result.diagnostic_notes && (
+                <Card className="mb-6">
+                  <CardHeader>
+                    <CardTitle className="text-lg">Notes diagnostiques</CardTitle>
+                  </CardHeader>
+                  <CardContent className="p-6">
+                    <p className="text-sm">{result.diagnostic_notes}</p>
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Métadonnées de l'IA */}
+              {result.metadata && (
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-lg">Métadonnées de l'analyse</CardTitle>
+                  </CardHeader>
+                  <CardContent className="p-6">
+                    <dl className="space-y-2 text-sm">
+                      {result.metadata.processingTime && (
+                        <div>
+                          <dt className="text-med-gray">Temps de traitement</dt>
+                          <dd>{result.metadata.processingTime}</dd>
+                        </div>
+                      )}
+                      {result.metadata.analysisTechnique && (
+                        <div>
+                          <dt className="text-med-gray">Technique d'analyse</dt>
+                          <dd>{result.metadata.analysisTechnique}</dd>
+                        </div>
+                      )}
+                      {result.metadata.detectionAlgorithm && (
+                        <div>
+                          <dt className="text-med-gray">Algorithme</dt>
+                          <dd>{result.metadata.detectionAlgorithm}</dd>
+                        </div>
+                      )}
+                      {result.metadata.aiModelVersion && (
+                        <div>
+                          <dt className="text-med-gray">Version du modèle</dt>
+                          <dd>{result.metadata.aiModelVersion}</dd>
+                        </div>
+                      )}
+                    </dl>
+                  </CardContent>
+                </Card>
+              )}
             </div>
           </div>
         </div>

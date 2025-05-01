@@ -1,422 +1,354 @@
 
-import React, { useState, useCallback } from 'react';
-import { useToast } from "@/components/ui/use-toast";
+import React, { useState, useRef } from 'react';
 import { Button } from "@/components/ui/button";
-import { detectDisease } from '../utils/mockApi';
-import { DetectionResult } from '../types';
+import { Card, CardContent } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Upload, Camera, FileImage, AlertCircle, CheckCircle2, Loader2 } from 'lucide-react';
+import { DetectionResult } from '@/types';
 import ResultsDisplay from './ResultsDisplay';
-import { Upload, X, File, Check, Info, Layers, Brain, CircleCheck, FileImage, TestTube } from 'lucide-react';
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { getMockDetectionResult } from '@/utils/mockApi';
+import { useToast } from '@/components/ui/use-toast';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '@/contexts/AuthContext';
+import { saveAnalysisResult } from '@/services/analysisService';
 
-const UploadSection = () => {
-  const [isDragging, setIsDragging] = useState(false);
-  const [uploadedImage, setUploadedImage] = useState<string | null>(null);
-  const [originalFile, setOriginalFile] = useState<File | null>(null);
+const UploadSection: React.FC = () => {
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [detectionResult, setDetectionResult] = useState<DetectionResult | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const [result, setResult] = useState<DetectionResult | null>(null);
+  const [activeTab, setActiveTab] = useState('upload');
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
-
-  const handleDragEnter = useCallback((e: React.DragEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setIsDragging(true);
-  }, []);
-
-  const handleDragLeave = useCallback((e: React.DragEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setIsDragging(false);
-  }, []);
-
-  const handleDragOver = useCallback((e: React.DragEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    if (!isDragging) {
-      setIsDragging(true);
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0] || null;
+    if (file) {
+      if (!file.type.startsWith('image/')) {
+        toast({
+          title: "Format de fichier non supporté",
+          description: "Veuillez sélectionner une image",
+          variant: "destructive",
+        });
+        return;
+      }
+      
+      setSelectedFile(file);
+      const fileURL = URL.createObjectURL(file);
+      setImagePreview(fileURL);
+      setDetectionResult(null);
     }
-  }, [isDragging]);
-
-  const validateFile = (file: File) => {
-    // Check file type
-    const validTypes = ['image/jpeg', 'image/png', 'application/dicom'];
-    if (!validTypes.includes(file.type)) {
-      toast({
-        title: "Format non supporté",
-        description: "Veuillez télécharger une image au format JPG, PNG ou DICOM.",
-        variant: "destructive"
-      });
-      return false;
-    }
-    
-    // Check file size (max 10MB)
-    const maxSize = 10 * 1024 * 1024; // 10MB in bytes
-    if (file.size > maxSize) {
-      toast({
-        title: "Fichier trop volumineux",
-        description: "La taille du fichier ne doit pas dépasser 10 MB.",
-        variant: "destructive"
-      });
-      return false;
-    }
-    
-    return true;
   };
 
-  const handleDrop = useCallback((e: React.DragEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setIsDragging(false);
+  const handleDrop = (event: React.DragEvent<HTMLDivElement>) => {
+    event.preventDefault();
+    event.stopPropagation();
     
-    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-      const file = e.dataTransfer.files[0];
-      if (validateFile(file)) {
-        setOriginalFile(file);
-        setResult(null);
-        
-        const reader = new FileReader();
-        reader.onload = () => {
-          setUploadedImage(reader.result as string);
-        };
-        reader.readAsDataURL(file);
-      }
-    }
-  }, [toast]);
-
-  const handleFileChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files.length > 0) {
-      const file = e.target.files[0];
-      if (validateFile(file)) {
-        setOriginalFile(file);
-        setResult(null);
-        
-        const reader = new FileReader();
-        reader.onload = () => {
-          setUploadedImage(reader.result as string);
-        };
-        reader.readAsDataURL(file);
-      }
-    }
-  }, [toast]);
-
-  const handleAnalyze = async () => {
-    if (!originalFile) return;
-
-    setIsAnalyzing(true);
-    try {
-      const detectionResult = await detectDisease(originalFile);
-      setResult(detectionResult);
+    const file = event.dataTransfer.files[0];
+    if (file && file.type.startsWith('image/')) {
+      setSelectedFile(file);
+      const fileURL = URL.createObjectURL(file);
+      setImagePreview(fileURL);
+      setDetectionResult(null);
+    } else {
       toast({
-        title: "Analyse terminée",
-        description: "L'analyse de votre image a été complétée avec succès.",
-        variant: "default",
+        title: "Format de fichier non supporté",
+        description: "Veuillez déposer une image",
+        variant: "destructive",
       });
+    }
+  };
+
+  const handleDragOver = (event: React.DragEvent<HTMLDivElement>) => {
+    event.preventDefault();
+    event.stopPropagation();
+  };
+
+  const uploadToServer = async (file: File) => {
+    // This would normally upload to a server but for demo purposes we'll create a mock URL
+    return URL.createObjectURL(file);
+  };
+
+  const handleAnalyzeClick = async () => {
+    if (!selectedFile) {
+      toast({
+        title: "Aucune image sélectionnée",
+        description: "Veuillez sélectionner une image à analyser",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    try {
+      setIsAnalyzing(true);
+      
+      // In a real app, you'd upload the image to a server and get back a result
+      setTimeout(async () => {
+        const result = getMockDetectionResult();
+        setDetectionResult(result);
+        
+        // Save the result to Supabase if user is logged in
+        if (user) {
+          try {
+            // Upload image to server (mock)
+            const imageUrl = await uploadToServer(selectedFile);
+            
+            // Save result to Supabase
+            await saveAnalysisResult(user.id, imageUrl, result);
+            
+            toast({
+              title: "Résultat enregistré",
+              description: "Votre analyse a été enregistrée dans votre historique",
+            });
+          } catch (error) {
+            console.error("Error saving result:", error);
+            toast({
+              title: "Erreur d'enregistrement",
+              description: "Impossible d'enregistrer votre analyse",
+              variant: "destructive",
+            });
+          }
+        }
+        
+        setIsAnalyzing(false);
+      }, 2000);
     } catch (error) {
       console.error("Error analyzing image:", error);
+      setIsAnalyzing(false);
       toast({
         title: "Erreur d'analyse",
-        description: "Une erreur est survenue lors de l'analyse de l'image.",
-        variant: "destructive"
+        description: "Une erreur est survenue lors de l'analyse de l'image",
+        variant: "destructive",
       });
-    } finally {
-      setIsAnalyzing(false);
     }
   };
 
-  const resetUpload = () => {
-    setUploadedImage(null);
-    setOriginalFile(null);
-    setResult(null);
+  const handleTakePhoto = () => {
+    // This would open the camera on mobile devices
+    toast({
+      title: "Fonctionnalité en développement",
+      description: "La prise de photo sera bientôt disponible",
+    });
+  };
+
+  const handleButtonClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleReset = () => {
+    setSelectedFile(null);
+    setImagePreview(null);
+    setDetectionResult(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
+  const handleViewHistory = () => {
+    if (user) {
+      navigate('/dashboard');
+    } else {
+      toast({
+        title: "Connexion requise",
+        description: "Veuillez vous connecter pour accéder à votre historique d'analyses",
+      });
+      navigate('/login');
+    }
   };
 
   return (
-    <section id="upload" className="py-16 bg-gradient-to-br from-white to-soft-pink/10">
+    <section id="upload-section" className="py-16 bg-gradient-to-b from-white to-soft-blue/10">
       <div className="container-custom">
-        <div className="text-center mb-12">
-          <span className="inline-block px-4 py-2 bg-soft-pink bg-opacity-20 rounded-full text-dark-pink font-medium text-sm mb-4">
-            Analyse IA sécurisée
-          </span>
-          <h2 className="text-3xl font-bold mb-4">Analyse d'images médicales</h2>
+        <div className="mb-8 text-center">
+          <h2 className="text-2xl md:text-3xl font-bold mb-3">Détectez les cancers avec notre IA</h2>
           <p className="text-med-gray max-w-2xl mx-auto">
-            Téléchargez votre image médicale pour une analyse rapide et précise par notre intelligence artificielle.
-            Notre technologie analyse avec précision différents types d'imageries médicales pour aider au diagnostic.
+            Téléchargez une image médicale pour obtenir une analyse instantanée. Notre système d'intelligence artificielle vous fournira une évaluation rapide et précise.
           </p>
-          
-          <div className="flex flex-wrap justify-center gap-4 mt-6">
-            <div className="flex items-center bg-soft-gray rounded-full px-4 py-2">
-              <Check className="h-4 w-4 text-med-pink mr-2" />
-              <span className="text-sm">Analyse rapide</span>
-            </div>
-            <div className="flex items-center bg-soft-gray rounded-full px-4 py-2">
-              <Check className="h-4 w-4 text-med-pink mr-2" />
-              <span className="text-sm">Haute précision</span>
-            </div>
-            <div className="flex items-center bg-soft-gray rounded-full px-4 py-2">
-              <Check className="h-4 w-4 text-med-pink mr-2" />
-              <span className="text-sm">Résultats instantanés</span>
-            </div>
-          </div>
         </div>
 
-        {/* Section d'explication améliorée */}
-        <div className="bg-white rounded-xl shadow-sm p-8 mb-10 max-w-4xl mx-auto">
-          <h3 className="text-xl font-bold mb-6 text-center">Notre technologie d'analyse avancée</h3>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div>
-              <h4 className="font-medium text-lg mb-4 flex items-center">
-                <Brain className="h-5 w-5 text-med-pink mr-2" /> 
-                Notre IA de détection
-              </h4>
-              <p className="text-med-gray mb-4">
-                Notre système utilise des réseaux neuronaux convolutifs (CNN) et des modèles de deep learning 
-                spécialement entraînés sur plus de 150 000 images médicales pour détecter avec une précision de 95% 
-                les signes précoces de différentes pathologies cancéreuses.
-              </p>
-              <Accordion type="single" collapsible className="w-full">
-                <AccordionItem value="item-1">
-                  <AccordionTrigger className="text-med-pink">Types d'images acceptées</AccordionTrigger>
-                  <AccordionContent>
-                    <ul className="list-disc pl-5 text-med-gray space-y-2">
-                      <li>Radiographies (rayons X)</li>
-                      <li>IRM (Imagerie par Résonance Magnétique)</li>
-                      <li>Scanners CT (tomodensitométrie)</li>
-                      <li>Mammographies</li>
-                      <li>PET scans</li>
-                      <li>Échographies</li>
-                    </ul>
-                  </AccordionContent>
-                </AccordionItem>
-                <AccordionItem value="item-2">
-                  <AccordionTrigger className="text-med-pink">Formats de fichiers supportés</AccordionTrigger>
-                  <AccordionContent>
-                    <ul className="list-disc pl-5 text-med-gray space-y-2">
-                      <li>JPEG/JPG (format d'image standard)</li>
-                      <li>PNG (haute qualité sans perte)</li>
-                      <li>DICOM (format standard médical)</li>
-                      <li>TIFF (pour images haute résolution)</li>
-                      <li>Taille maximale: 10MB</li>
-                    </ul>
-                  </AccordionContent>
-                </AccordionItem>
-                <AccordionItem value="item-3">
-                  <AccordionTrigger className="text-med-pink">Algorithmes et modèles utilisés</AccordionTrigger>
-                  <AccordionContent>
-                    <ul className="list-disc pl-5 text-med-gray space-y-2">
-                      <li>Réseaux neuronaux convolutifs (CNN)</li>
-                      <li>Modèles de deep learning spécialisés par type de cancer</li>
-                      <li>Détection d'anomalies basée sur YOLOv5 et ResNet</li>
-                      <li>Segmentation sémantique U-Net</li>
-                      <li>Classification par densité avec DenseNet-121</li>
-                      <li>Modèles benchmarkés sur des ensembles de données validés cliniquement</li>
-                    </ul>
-                  </AccordionContent>
-                </AccordionItem>
-              </Accordion>
-            </div>
-
-            <div>
-              <h4 className="font-medium text-lg mb-4 flex items-center">
-                <TestTube className="h-5 w-5 text-med-pink mr-2" /> 
-                Processus d'analyse détaillé
-              </h4>
-
-              <div className="space-y-4">
-                <div className="flex items-start">
-                  <div className="flex-shrink-0 w-8 h-8 bg-soft-pink rounded-full flex items-center justify-center text-white font-bold">1</div>
-                  <div className="ml-3">
-                    <h5 className="font-medium">Prétraitement de l'image</h5>
-                    <p className="text-sm text-med-gray">Normalisation, recadrage intelligent, suppression de bruit et amélioration du contraste pour optimiser l'analyse</p>
-                  </div>
-                </div>
-                
-                <div className="flex items-start">
-                  <div className="flex-shrink-0 w-8 h-8 bg-soft-pink rounded-full flex items-center justify-center text-white font-bold">2</div>
-                  <div className="ml-3">
-                    <h5 className="font-medium">Segmentation et analyse de régions</h5>
-                    <p className="text-sm text-med-gray">Détection automatique des structures anatomiques pertinentes et isolation des zones d'intérêt</p>
-                  </div>
-                </div>
-                
-                <div className="flex items-start">
-                  <div className="flex-shrink-0 w-8 h-8 bg-soft-pink rounded-full flex items-center justify-center text-white font-bold">3</div>
-                  <div className="ml-3">
-                    <h5 className="font-medium">Détection de caractéristiques</h5>
-                    <p className="text-sm text-med-gray">Identification des marqueurs tumoraux, masses, calcifications et autres anomalies tissulaires</p>
-                  </div>
-                </div>
-                
-                <div className="flex items-start">
-                  <div className="flex-shrink-0 w-8 h-8 bg-soft-pink rounded-full flex items-center justify-center text-white font-bold">4</div>
-                  <div className="ml-3">
-                    <h5 className="font-medium">Classification et score de risque</h5>
-                    <p className="text-sm text-med-gray">Attribution d'un niveau de risque basé sur des milliers de cas cliniques et protocoles médicaux</p>
-                  </div>
-                </div>
-                
-                <div className="flex items-start">
-                  <div className="flex-shrink-0 w-8 h-8 bg-soft-pink rounded-full flex items-center justify-center text-white font-bold">5</div>
-                  <div className="ml-3">
-                    <h5 className="font-medium">Génération de rapport</h5>
-                    <p className="text-sm text-med-gray">Création d'un rapport détaillé avec visualisations, métriques et recommandations cliniques</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="mt-8 bg-soft-pink/10 p-4 rounded-lg flex flex-col md:flex-row items-center gap-4">
-            <div className="flex-shrink-0 w-full md:w-1/3">
-              <div className="border border-soft-pink rounded-lg overflow-hidden">
-                <img
-                  src="https://www.researchgate.net/profile/Sukhpal-Kaur-7/publication/351655396/figure/fig2/AS:1024116972736513@1621456642968/Examples-Of-Benign-And-Malignant-Breast-Cancer-Mammogram-Images.png"
-                  alt="Exemple d'analyse radiographique"
-                  className="w-full"
-                />
-              </div>
-            </div>
-            <div>
-              <h5 className="text-lg font-medium mb-2 flex items-center">
-                <CircleCheck className="h-5 w-5 text-med-pink mr-2" />
-                Exemple d'analyse
-              </h5>
-              <p className="text-sm text-med-gray mb-2">
-                Notre système détecte les anomalies et les met en évidence, fournissant un score de confiance 
-                et des recommandations personnalisées pour chaque analyse. L'image montre la différence entre une lésion 
-                bénigne et maligne détectée par notre système d'IA.
-              </p>
-              <div className="flex gap-2">
-                <div className="text-xs bg-soft-gray px-2 py-1 rounded-full">Précision : 95%</div>
-                <div className="text-xs bg-soft-gray px-2 py-1 rounded-full">Sensibilité : 98%</div>
-                <div className="text-xs bg-soft-gray px-2 py-1 rounded-full">Spécificité : 92%</div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {!uploadedImage ? (
-          <div 
-            className={`upload-zone mx-auto max-w-2xl ${isDragging ? 'upload-zone-active' : ''}`}
-            onDragEnter={handleDragEnter}
-            onDragOver={handleDragOver}
-            onDragLeave={handleDragLeave}
-            onDrop={handleDrop}
-          >
-            <div className="w-16 h-16 bg-soft-pink bg-opacity-20 rounded-full flex items-center justify-center mb-4">
-              <Upload className="h-8 w-8 text-med-pink" />
-            </div>
-            <h3 className="text-xl font-medium mb-2">Déposez votre image ici</h3>
-            <p className="text-med-gray mb-6 text-center">
-              ou
-            </p>
-            <label className="btn-primary cursor-pointer">
-              <File className="h-5 w-5 mr-2" /> Parcourir les fichiers
-              <input 
-                type="file" 
-                className="hidden" 
-                accept=".jpg,.jpeg,.png,.dcm"
-                onChange={handleFileChange}
-              />
-            </label>
-            
-            <div className="mt-8 pt-6 border-t border-dashed border-soft-gray w-full">
-              <div className="flex items-center justify-center text-sm text-med-gray">
-                <Info className="h-4 w-4 mr-2 text-med-pink" />
-                <span>Formats acceptés : JPG, PNG, DICOM (max. 10MB)</span>
-              </div>
-            </div>
-          </div>
-        ) : (
-          <div className="max-w-4xl mx-auto bg-white rounded-xl shadow-md p-8">
-            <div className="flex flex-col lg:flex-row gap-8">
-              <div className="lg:w-1/2">
-                <div className="relative">
-                  <div className="absolute top-2 right-2 z-10">
-                    <Button 
-                      variant="secondary" 
-                      size="icon"
-                      className="rounded-full bg-white bg-opacity-70 hover:bg-opacity-100"
-                      onClick={resetUpload}
-                    >
-                      <X className="h-4 w-4" />
-                    </Button>
-                  </div>
-                  <img 
-                    src={uploadedImage} 
-                    alt="Image téléchargée" 
-                    className="w-full rounded-xl shadow-md object-cover max-h-80"
-                  />
-                  <div className="mt-4">
-                    <div className="flex items-center justify-between mb-3">
-                      <p className="text-sm text-med-gray">
-                        {originalFile?.name}
-                      </p>
-                      <p className="text-xs bg-soft-gray px-2 py-1 rounded-full">
-                        {Math.round(originalFile?.size ? originalFile.size / 1024 : 0)} KB
-                      </p>
-                    </div>
-                    {!result && (
-                      <Button 
-                        className="btn-primary w-full" 
-                        onClick={handleAnalyze}
-                        disabled={isAnalyzing}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <div>
+            <Tabs defaultValue="upload" className="mb-6" onValueChange={setActiveTab}>
+              <TabsList className="grid grid-cols-2 mb-4">
+                <TabsTrigger value="upload" className="flex items-center">
+                  <Upload className="h-4 w-4 mr-2" />
+                  Télécharger
+                </TabsTrigger>
+                <TabsTrigger value="camera" className="flex items-center">
+                  <Camera className="h-4 w-4 mr-2" />
+                  Prendre une photo
+                </TabsTrigger>
+              </TabsList>
+              
+              <TabsContent value="upload">
+                <Card>
+                  <CardContent className="p-6">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      ref={fileInputRef}
+                      onChange={handleFileChange}
+                    />
+                    
+                    {!imagePreview ? (
+                      <div 
+                        className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center cursor-pointer hover:border-med-blue transition-colors"
+                        onClick={handleButtonClick}
+                        onDrop={handleDrop}
+                        onDragOver={handleDragOver}
                       >
-                        {isAnalyzing ? (
-                          <>
-                            <div className="h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
-                            Analyse en cours...
-                          </>
-                        ) : (
-                          <>🧠 Lancer la détection</>
-                        )}
-                      </Button>
-                    )}
-                  </div>
-                </div>
-              </div>
-
-              <div className="lg:w-1/2">
-                {result ? (
-                  <ResultsDisplay result={result} />
-                ) : (
-                  <div className="h-full flex items-center justify-center">
-                    {isAnalyzing ? (
-                      <div className="text-center">
-                        <div className="w-16 h-16 border-4 border-med-pink border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-                        <p className="text-lg font-medium">Analyse en cours...</p>
-                        <p className="text-med-gray">Notre IA est en train d'analyser votre image</p>
-                        
-                        <div className="mt-6 max-w-xs mx-auto">
-                          <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
-                            <div className="h-full bg-med-pink animate-pulse" style={{ width: '70%' }}></div>
-                          </div>
-                        </div>
+                        <FileImage className="h-12 w-12 mx-auto mb-4 text-med-gray" />
+                        <h3 className="font-medium mb-2">Déposez votre image ici</h3>
+                        <p className="text-sm text-med-gray mb-4">ou</p>
+                        <Button onClick={(e) => {
+                          e.stopPropagation();
+                          handleButtonClick();
+                        }}>
+                          Parcourir
+                        </Button>
+                        <p className="mt-4 text-xs text-med-gray">
+                          Formats acceptés: PNG, JPG, JPEG, DICOM
+                        </p>
                       </div>
                     ) : (
-                      <div className="text-center p-8 border border-dashed border-soft-pink rounded-xl">
-                        <div className="w-16 h-16 bg-soft-pink bg-opacity-20 rounded-full flex items-center justify-center mx-auto mb-4">
-                          <Info className="h-8 w-8 text-med-pink" />
+                      <div>
+                        <div className="relative overflow-hidden rounded-lg mb-4 border border-gray-200">
+                          <img 
+                            src={imagePreview} 
+                            alt="Aperçu" 
+                            className="w-full h-auto max-h-80 object-contain"
+                          />
+                          {detectionResult && (
+                            <div className={`absolute top-2 right-2 px-2 py-1 rounded text-xs font-medium ${
+                              detectionResult.prediction.toLowerCase().includes('anomalie') ? 
+                                'bg-destructive/80 text-white' : 
+                                'bg-emerald-500/80 text-white'
+                            }`}>
+                              Confiance: {detectionResult.confidence.toFixed(1)}%
+                            </div>
+                          )}
                         </div>
-                        <p className="text-lg font-medium mb-2">Prêt pour l'analyse</p>
-                        <p className="text-med-gray">Cliquez sur "Lancer la détection" pour analyser votre image</p>
-                        <div className="flex flex-wrap justify-center gap-2 mt-6">
-                          <div className="text-xs bg-soft-gray px-3 py-1 rounded-full text-med-gray">
-                            Précision ~94%
-                          </div>
-                          <div className="text-xs bg-soft-gray px-3 py-1 rounded-full text-med-gray">
-                            Résultat en &lt;30s
-                          </div>
-                          <div className="text-xs bg-soft-gray px-3 py-1 rounded-full text-med-gray">
-                            Confidentiel
-                          </div>
+                        
+                        <div className="flex justify-between">
+                          <Button 
+                            variant="outline" 
+                            onClick={handleReset}
+                          >
+                            Changer d'image
+                          </Button>
+                          
+                          {!detectionResult ? (
+                            <Button 
+                              onClick={handleAnalyzeClick}
+                              disabled={isAnalyzing}
+                            >
+                              {isAnalyzing ? (
+                                <>
+                                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                  Analyse en cours...
+                                </>
+                              ) : 'Analyser l\'image'}
+                            </Button>
+                          ) : (
+                            <Button 
+                              variant="default" 
+                              onClick={handleViewHistory}
+                            >
+                              Voir mon historique
+                            </Button>
+                          )}
                         </div>
                       </div>
                     )}
+                  </CardContent>
+                </Card>
+              </TabsContent>
+              
+              <TabsContent value="camera">
+                <Card>
+                  <CardContent className="p-6 text-center">
+                    <Camera className="h-12 w-12 mx-auto mb-4 text-med-gray" />
+                    <h3 className="font-medium mb-4">Prendre une photo avec votre appareil</h3>
+                    <Button onClick={handleTakePhoto}>
+                      Activer la caméra
+                    </Button>
+                    <p className="mt-4 text-xs text-med-gray">
+                      Assurez-vous d'être dans un environnement bien éclairé
+                    </p>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+            </Tabs>
+
+            {!user && !detectionResult && activeTab === "upload" && (
+              <div className="bg-soft-yellow p-4 rounded-lg flex items-start gap-3">
+                <AlertCircle className="text-amber-600 flex-shrink-0 h-5 w-5 mt-0.5" />
+                <div>
+                  <h4 className="font-medium text-amber-800 mb-1">Connectez-vous pour sauvegarder vos analyses</h4>
+                  <p className="text-sm text-amber-700">
+                    Créez un compte ou connectez-vous pour enregistrer vos résultats et accéder à votre historique d'analyses.
+                  </p>
+                  <div className="mt-2 flex gap-3">
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="border-amber-600 text-amber-700 hover:bg-amber-50"
+                      onClick={() => navigate('/login')}
+                    >
+                      Se connecter
+                    </Button>
+                    <Button 
+                      size="sm" 
+                      className="bg-amber-600 hover:bg-amber-700 text-white"
+                      onClick={() => navigate('/register')}
+                    >
+                      Créer un compte
+                    </Button>
                   </div>
-                )}
+                </div>
               </div>
-            </div>
+            )}
+            
+            {detectionResult && (
+              <div className={`mt-4 p-4 rounded-lg flex items-start gap-3 ${
+                detectionResult.prediction.toLowerCase().includes('anomalie') ? 
+                  'bg-red-50' : 
+                  'bg-green-50'
+              }`}>
+                {detectionResult.prediction.toLowerCase().includes('anomalie') ? (
+                  <AlertCircle className="text-destructive flex-shrink-0 h-5 w-5 mt-0.5" />
+                ) : (
+                  <CheckCircle2 className="text-emerald-500 flex-shrink-0 h-5 w-5 mt-0.5" />
+                )}
+                <div>
+                  <h4 className={`font-medium mb-1 ${
+                    detectionResult.prediction.toLowerCase().includes('anomalie') ? 
+                      'text-destructive' : 
+                      'text-emerald-700'
+                  }`}>
+                    {detectionResult.prediction}
+                  </h4>
+                  <p className={`text-sm ${
+                    detectionResult.prediction.toLowerCase().includes('anomalie') ? 
+                      'text-red-700' : 
+                      'text-emerald-600'
+                  }`}>
+                    {detectionResult.recommendation}
+                  </p>
+                </div>
+              </div>
+            )}
           </div>
-        )}
+          
+          <div>
+            {detectionResult && (
+              <ResultsDisplay result={detectionResult} imageUrl={imagePreview || ''} />
+            )}
+          </div>
+        </div>
       </div>
     </section>
   );

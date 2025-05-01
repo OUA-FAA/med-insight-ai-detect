@@ -1,15 +1,16 @@
 
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/use-toast";
-import { EyeIcon, EyeOffIcon } from 'lucide-react';
+import { EyeIcon, EyeOffIcon, Loader2 } from 'lucide-react';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
+import { useAuth } from '@/contexts/AuthContext';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -19,6 +20,14 @@ const Login = () => {
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
+  const { signIn, user } = useAuth();
+
+  useEffect(() => {
+    // Redirect if already logged in
+    if (user) {
+      navigate('/dashboard');
+    }
+  }, [user, navigate]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -32,16 +41,16 @@ const Login = () => {
     }
 
     setIsLoading(true);
-
-    // Simulating login process
-    setTimeout(() => {
+    
+    try {
+      const { error } = await signIn(email, password);
+      
+      if (!error) {
+        navigate('/dashboard');
+      }
+    } finally {
       setIsLoading(false);
-      toast({
-        title: "Connexion réussie",
-        description: "Bienvenue sur votre tableau de bord",
-      });
-      navigate('/dashboard');
-    }, 1500);
+    }
   };
 
   return (
@@ -70,6 +79,7 @@ const Login = () => {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     className="transition-all focus:border-med-blue"
+                    disabled={isLoading}
                   />
                 </div>
                 <div className="space-y-2">
@@ -82,11 +92,13 @@ const Login = () => {
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       className="transition-all focus:border-med-blue pr-10"
+                      disabled={isLoading}
                     />
                     <button 
                       type="button"
                       className="absolute right-3 top-1/2 -translate-y-1/2 text-med-gray hover:text-dark-gray transition-colors"
                       onClick={() => setShowPassword(!showPassword)}
+                      disabled={isLoading}
                     >
                       {showPassword ? <EyeOffIcon size={18} /> : <EyeIcon size={18} />}
                     </button>
@@ -98,6 +110,7 @@ const Login = () => {
                       id="remember" 
                       checked={rememberMe} 
                       onCheckedChange={() => setRememberMe(!rememberMe)} 
+                      disabled={isLoading}
                     />
                     <label 
                       htmlFor="remember" 
@@ -117,7 +130,7 @@ const Login = () => {
                 >
                   {isLoading ? (
                     <>
-                      <div className="h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                       Connexion...
                     </>
                   ) : "Se connecter"}
@@ -134,6 +147,7 @@ const Login = () => {
                 variant="outline" 
                 className="w-full border-med-blue text-med-blue hover:bg-soft-blue"
                 onClick={() => navigate('/register')}
+                disabled={isLoading}
               >
                 Créer un compte
               </Button>
