@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
-import { useNavigate, useLocation } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Menu, X, LogOut, User } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import {
@@ -23,25 +23,29 @@ const Header = () => {
     setMobileMenuOpen(!mobileMenuOpen);
   };
 
-  // Navigation pour rediriger vers la page d'accueil
+  // Navigation for redirecting to the home page
   const handleLogoClick = () => {
     navigate('/');
+    setMobileMenuOpen(false);
   };
 
-  // Navigation vers la page de connexion
-  const handleLoginClick = () => {
-    navigate('/login');
+  // Navigate to "how it works" section
+  const handleHowItWorksClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    const howItWorksSection = document.getElementById('how-it-works');
+    if (howItWorksSection && location.pathname === '/') {
+      howItWorksSection.scrollIntoView({ behavior: 'smooth' });
+    } else {
+      navigate('/#how-it-works');
+    }
+    setMobileMenuOpen(false);
   };
 
-  // Navigation vers le tableau de bord
-  const handleDashboardClick = () => {
-    navigate('/dashboard');
-  };
-
-  // Déconnexion
+  // Logout with proper cleanup
   const handleLogoutClick = async () => {
     await signOut();
     navigate('/');
+    setMobileMenuOpen(false);
   };
 
   const displayName = profile?.first_name 
@@ -60,38 +64,26 @@ const Header = () => {
           </h1>
         </div>
         
-        {/* Menu pour bureau */}
+        {/* Menu for desktop */}
         <nav className="hidden md:block">
           <ul className="flex space-x-6 items-center">
             <li>
-              <a 
-                href="#" 
+              <Link 
+                to="/" 
                 className={`interactive-element ${
                   location.pathname === '/' 
                     ? 'text-dark-gray font-medium' 
                     : 'text-med-gray hover:text-dark-gray'
                 }`}
-                onClick={(e) => {
-                  e.preventDefault();
-                  navigate('/');
-                }}
               >
                 Accueil
-              </a>
+              </Link>
             </li>
             <li>
               <a 
-                href="#" 
+                href="#how-it-works" 
                 className="text-med-gray hover:text-dark-gray interactive-element"
-                onClick={(e) => {
-                  e.preventDefault();
-                  const howItWorksSection = document.getElementById('how-it-works');
-                  if (howItWorksSection) {
-                    howItWorksSection.scrollIntoView({ behavior: 'smooth' });
-                  } else {
-                    navigate('/#how-it-works');
-                  }
-                }}
+                onClick={handleHowItWorksClick}
               >
                 Comment ça marche
               </a>
@@ -103,7 +95,7 @@ const Header = () => {
                     variant="outline" 
                     size="sm" 
                     className="border-med-pink text-dark-gray hover:bg-soft-pink hover:bg-opacity-20"
-                    onClick={handleDashboardClick}
+                    onClick={() => navigate('/dashboard')}
                   >
                     Tableau de bord
                   </Button>
@@ -118,7 +110,7 @@ const Header = () => {
                     <DropdownMenuContent align="end">
                       <DropdownMenuLabel>Mon compte</DropdownMenuLabel>
                       <DropdownMenuSeparator />
-                      <DropdownMenuItem onClick={handleDashboardClick}>
+                      <DropdownMenuItem onClick={() => navigate('/dashboard')}>
                         Tableau de bord
                       </DropdownMenuItem>
                       <DropdownMenuItem onClick={handleLogoutClick}>
@@ -135,7 +127,7 @@ const Header = () => {
                   variant="outline" 
                   size="sm" 
                   className="border-med-pink text-dark-gray hover:bg-soft-pink hover:bg-opacity-20"
-                  onClick={handleLoginClick}
+                  onClick={() => navigate('/login')}
                 >
                   Connexion
                 </Button>
@@ -144,7 +136,7 @@ const Header = () => {
           </ul>
         </nav>
         
-        {/* Bouton menu mobile */}
+        {/* Mobile menu button */}
         <div className="md:hidden">
           <Button 
             variant="ghost" 
@@ -161,82 +153,56 @@ const Header = () => {
         </div>
       </div>
       
-      {/* Menu mobile */}
+      {/* Mobile menu */}
       {mobileMenuOpen && (
         <div className="md:hidden border-t border-soft-gray mt-4 animate-fade-in">
           <div className="container-custom py-4 flex flex-col gap-4">
-            <a 
-              href="#" 
+            <Link 
+              to="/" 
               className={`px-2 py-2 rounded-md ${
                 location.pathname === '/' 
                   ? 'bg-soft-pink text-dark-gray font-medium' 
                   : 'text-med-gray hover:bg-soft-gray'
               }`}
-              onClick={(e) => {
-                e.preventDefault();
-                navigate('/');
-                setMobileMenuOpen(false);
-              }}
+              onClick={() => setMobileMenuOpen(false)}
             >
               Accueil
-            </a>
+            </Link>
             <a 
-              href="#" 
+              href="#how-it-works" 
               className="px-2 py-2 rounded-md text-med-gray hover:bg-soft-gray"
-              onClick={(e) => {
-                e.preventDefault();
-                const howItWorksSection = document.getElementById('how-it-works');
-                if (howItWorksSection) {
-                  howItWorksSection.scrollIntoView({ behavior: 'smooth' });
-                } else {
-                  navigate('/#how-it-works');
-                }
-                setMobileMenuOpen(false);
-              }}
+              onClick={handleHowItWorksClick}
             >
               Comment ça marche
             </a>
             {user ? (
               <>
-                <a 
-                  href="#" 
+                <Link 
+                  to="/dashboard" 
                   className="px-2 py-2 rounded-md text-med-gray hover:bg-soft-gray"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    navigate('/dashboard');
-                    setMobileMenuOpen(false);
-                  }}
+                  onClick={() => setMobileMenuOpen(false)}
                 >
                   Tableau de bord
-                </a>
+                </Link>
                 <div className="border-t border-soft-gray my-2"></div>
                 <div className="px-2 py-2 text-sm text-med-gray">
                   Connecté en tant que: {displayName}
                 </div>
-                <a 
-                  href="#" 
-                  className="px-2 py-2 rounded-md text-med-gray hover:bg-soft-gray flex items-center"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    handleLogoutClick();
-                    setMobileMenuOpen(false);
-                  }}
+                <button 
+                  className="px-2 py-2 rounded-md text-med-gray hover:bg-soft-gray flex items-center text-left w-full"
+                  onClick={handleLogoutClick}
                 >
                   <LogOut className="h-4 w-4 mr-2" /> Déconnexion
-                </a>
+                </button>
               </>
             ) : (
-              <a 
-                href="#" 
+              <Link 
+                to="/login" 
                 className="px-2 py-2 rounded-md text-med-gray hover:bg-soft-gray"
-                onClick={(e) => {
-                  e.preventDefault();
-                  navigate('/login');
-                  setMobileMenuOpen(false);
-                }}
+                onClick={() => setMobileMenuOpen(false)}
               >
                 Connexion
-              </a>
+              </Link>
             )}
           </div>
         </div>
