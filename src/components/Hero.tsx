@@ -3,19 +3,17 @@ import { Button } from "@/components/ui/button";
 import { useNavigate } from 'react-router-dom';
 import { FileImage, InfoIcon, ArrowDown } from 'lucide-react';
 import HowItWorksDialog from './HowItWorksDialog';
-
 const Hero = () => {
   const navigate = useNavigate();
-
   const scrollToUpload = () => {
     const uploadSection = document.getElementById('upload');
     if (uploadSection) {
-      uploadSection.scrollIntoView({ behavior: 'smooth' });
+      uploadSection.scrollIntoView({
+        behavior: 'smooth'
+      });
     }
   };
-
-  return (
-    <section className="py-12 md:py-20 bg-gradient-to-b from-white to-soft-pink/20">
+  return <section className="py-12 md:py-20 bg-gradient-to-b from-white to-soft-pink/20">
       <div className="container-custom">
         <div className="flex flex-col md:flex-row items-center">
           <div className="md:w-1/2 md:pr-12">
@@ -28,10 +26,7 @@ const Hero = () => {
               à détecter des anomalies potentielles liées au cancer. Un outil d'assistance rapide et fiable pour les professionnels de santé.
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
-              <Button 
-                className="btn-primary group"
-                onClick={scrollToUpload}
-              >
+              <Button className="btn-primary group" onClick={scrollToUpload}>
                 <FileImage className="mr-1 h-4 w-4 transition-transform group-hover:scale-110" />
                 Commencer l'analyse
               </Button>
@@ -41,11 +36,7 @@ const Hero = () => {
           <div className="md:w-1/2 mt-8 md:mt-0">
             <div className="relative">
               <div className="bg-med-pink rounded-full w-80 h-80 opacity-20 absolute -top-10 -right-10 z-0"></div>
-              <img 
-                src="https://t3.ftcdn.net/jpg/00/96/48/10/360_F_96481070_Ui70kZamxUUnulNIL1qts69OYE0qmGs6.jpg"
-                alt="Cancer detection using AI" 
-                className="rounded-2xl shadow-lg z-10 relative hover-scale"
-              />
+              <img alt="Cancer detection using AI" className="rounded-2xl shadow-lg z-10 relative hover-scale" src="https://plus.unsplash.com/premium_photo-1708371357440-823fea28e971?q=80&w=1976&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" />
               <div className="bg-soft-gray rounded-full w-40 h-40 opacity-30 absolute -bottom-5 -left-5 z-0"></div>
             </div>
           </div>
@@ -66,18 +57,12 @@ const Hero = () => {
         </div>
 
         <div className="mt-16 text-center">
-          <Button 
-            variant="ghost" 
-            className="text-med-gray hover:text-dark-gray animate-bounce"
-            onClick={scrollToUpload}
-          >
+          <Button variant="ghost" className="text-med-gray hover:text-dark-gray animate-bounce" onClick={scrollToUpload}>
             <ArrowDown className="mr-1 h-4 w-4" />
             Faire une analyse
           </Button>
         </div>
       </div>
-    </section>
-  );
+    </section>;
 };
-
 export default Hero;
