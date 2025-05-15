@@ -1,9 +1,11 @@
+
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Menu, X, LogOut, User } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+
 const Header = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const navigate = useNavigate();
@@ -13,6 +15,7 @@ const Header = () => {
     signOut,
     profile
   } = useAuth();
+
   const toggleMobileMenu = () => {
     setMobileMenuOpen(!mobileMenuOpen);
   };
@@ -43,13 +46,17 @@ const Header = () => {
     navigate('/');
     setMobileMenuOpen(false);
   };
+
   const displayName = profile?.first_name ? `${profile.first_name}${profile.last_name ? ' ' + profile.last_name[0] + '.' : ''}` : user?.email?.split('@')[0];
+
   return <header className="bg-white shadow-sm py-4 sticky top-0 z-50">
       <div className="container-custom flex justify-between items-center">
         <div className="flex items-center cursor-pointer" onClick={handleLogoClick}>
-          <h1 className="text-xl md:text-2xl font-bold text-dark-gray">
-            <span className="text-med-pink">Med</span>Cancer
-          </h1>
+          <img 
+            src="/lovable-uploads/648b491b-c166-4d18-925c-8ca51d452c58.png" 
+            alt="MedCancer Logo" 
+            className="h-10 md:h-12 mr-2"
+          />
         </div>
         
         {/* Menu for desktop */}
@@ -134,4 +141,5 @@ const Header = () => {
         </div>}
     </header>;
 };
+
 export default Header;
