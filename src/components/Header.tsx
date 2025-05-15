@@ -92,7 +92,7 @@ const Header = () => {
                   </DropdownMenu>
                 </li>
               </> : <li>
-                <Button variant="outline" size="sm" onClick={() => navigate('/login')} className="border-med-pink text-dark-gray hover:bg-soft-pink hover:bg-opacity-20 text-zinc-950">
+                <Button variant="outline" size="sm" onClick={() => navigate('/login')} className="border-med-pink text-dark-gray hover:bg-soft-pink hover:bg-opacity-20 text-zinc-950 bg-red-50">
                   Connexion
                 </Button>
               </li>}
