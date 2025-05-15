@@ -237,7 +237,7 @@ const UploadSection: React.FC = () => {
                     Créez un compte ou connectez-vous pour enregistrer vos résultats et accéder à votre historique d'analyses.
                   </p>
                   <div className="mt-2 flex gap-3">
-                    <Button variant="outline" size="sm" onClick={() => navigate('/login')} className="border-amber-600 bg-slate-50 text-amber-600">
+                    <Button variant="outline" size="sm" onClick={() => navigate('/login')} className="border-amber-600 bg-slate-50 text-amber-700">
                       Se connecter
                     </Button>
                     <Button size="sm" className="bg-amber-600 hover:bg-amber-700 text-white" onClick={() => navigate('/register')}>
