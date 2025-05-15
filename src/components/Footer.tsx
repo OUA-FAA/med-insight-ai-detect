@@ -8,7 +8,7 @@ const Footer = () => {
         <div className="flex flex-col md:flex-row justify-between gap-8 mb-8">
           <div className="md:w-1/2">
             <h2 className="text-xl font-bold mb-4">
-              <span className="text-med-pink">Radia</span>Detect AI
+              <span className="text-[#EC407A]">Med</span><span className="text-[#0B3954]">Cancer</span>
             </h2>
             <p className="text-med-gray">
               Une plateforme d'analyse d'images médicales par intelligence artificielle conçue pour assister les professionnels de santé.
@@ -27,7 +27,7 @@ const Footer = () => {
           <div>
             <h3 className="font-medium mb-3">Contact</h3>
             <ul className="space-y-2">
-              <li className="text-med-gray">contact@radiadetect.ai</li>
+              <li className="text-med-gray">contact@medcancer.ai</li>
               <li className="text-med-gray">+33 (0)1 23 45 67 89</li>
             </ul>
           </div>
@@ -43,7 +43,7 @@ const Footer = () => {
           </div>
 
           <p className="text-center text-sm text-med-gray">
-            © 2025 RadiaDetect AI. Tous droits réservés.
+            © 2025 MedCancer. Tous droits réservés.
           </p>
         </div>
       </div>

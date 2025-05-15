@@ -53,7 +53,7 @@ const Header = () => {
       <div className="container-custom flex justify-between items-center">
         <div className="flex items-center cursor-pointer" onClick={handleLogoClick}>
           <img 
-            src="/lovable-uploads/648b491b-c166-4d18-925c-8ca51d452c58.png" 
+            src="/lovable-uploads/2576afa1-087b-42a8-9e0f-6a0c9b92fc76.png" 
             alt="MedCancer Logo" 
             className="h-10 md:h-12 mr-2"
           />

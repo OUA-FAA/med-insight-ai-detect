@@ -1,10 +1,13 @@
+
 import React from 'react';
 import { Button } from "@/components/ui/button";
 import { useNavigate } from 'react-router-dom';
 import { FileImage, InfoIcon, ArrowDown } from 'lucide-react';
 import HowItWorksDialog from './HowItWorksDialog';
+
 const Hero = () => {
   const navigate = useNavigate();
+  
   const scrollToUpload = () => {
     const uploadSection = document.getElementById('upload');
     if (uploadSection) {
@@ -13,6 +16,7 @@ const Hero = () => {
       });
     }
   };
+
   return <section className="py-12 md:py-20 bg-gradient-to-b from-white to-soft-pink/20">
       <div className="container-custom">
         <div className="flex flex-col md:flex-row items-center">
@@ -65,4 +69,5 @@ const Hero = () => {
       </div>
     </section>;
 };
+
 export default Hero;
