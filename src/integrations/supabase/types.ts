@@ -9,7 +9,137 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      analysis_results: {
+        Row: {
+          accuracy: string | null
+          cancer_risk_score: number | null
+          confidence: number
+          created_at: string
+          diagnostic_notes: string | null
+          format: string | null
+          id: string
+          image_type: string | null
+          image_url: string
+          metadata: Json | null
+          prediction: string
+          recommendation: string | null
+          resolution: string | null
+          sensitivity: string | null
+          specificity: string | null
+          tissues: string | null
+          user_id: string
+        }
+        Insert: {
+          accuracy?: string | null
+          cancer_risk_score?: number | null
+          confidence: number
+          created_at?: string
+          diagnostic_notes?: string | null
+          format?: string | null
+          id?: string
+          image_type?: string | null
+          image_url: string
+          metadata?: Json | null
+          prediction: string
+          recommendation?: string | null
+          resolution?: string | null
+          sensitivity?: string | null
+          specificity?: string | null
+          tissues?: string | null
+          user_id: string
+        }
+        Update: {
+          accuracy?: string | null
+          cancer_risk_score?: number | null
+          confidence?: number
+          created_at?: string
+          diagnostic_notes?: string | null
+          format?: string | null
+          id?: string
+          image_type?: string | null
+          image_url?: string
+          metadata?: Json | null
+          prediction?: string
+          recommendation?: string | null
+          resolution?: string | null
+          sensitivity?: string | null
+          specificity?: string | null
+          tissues?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      anomaly_areas: {
+        Row: {
+          classification: string | null
+          confidence: number | null
+          created_at: string
+          description: string | null
+          height: number
+          id: string
+          result_id: string
+          size: string | null
+          width: number
+          x: number
+          y: number
+        }
+        Insert: {
+          classification?: string | null
+          confidence?: number | null
+          created_at?: string
+          description?: string | null
+          height: number
+          id?: string
+          result_id: string
+          size?: string | null
+          width: number
+          x: number
+          y: number
+        }
+        Update: {
+          classification?: string | null
+          confidence?: number | null
+          created_at?: string
+          description?: string | null
+          height?: number
+          id?: string
+          result_id?: string
+          size?: string | null
+          width?: number
+          x?: number
+          y?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "anomaly_areas_result_id_fkey"
+            columns: ["result_id"]
+            isOneToOne: false
+            referencedRelation: "analysis_results"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          first_name: string | null
+          id: string
+          last_name: string | null
+        }
+        Insert: {
+          created_at?: string
+          first_name?: string | null
+          id: string
+          last_name?: string | null
+        }
+        Update: {
+          created_at?: string
+          first_name?: string | null
+          id?: string
+          last_name?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

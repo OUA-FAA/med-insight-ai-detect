@@ -75,7 +75,7 @@ export const getUserAnalysisResults = async (userId: string): Promise<AnalysisRe
 
     // Fetch areas for each result
     const enhancedResults = await Promise.all(
-      results.map(async (result) => {
+      results.map(async (result: any) => {
         const { data: areas, error: areasError } = await supabase
           .from('anomaly_areas')
           .select('*')
