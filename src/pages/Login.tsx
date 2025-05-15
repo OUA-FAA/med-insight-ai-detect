@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
@@ -11,40 +10,41 @@ import { EyeIcon, EyeOffIcon, Loader2 } from 'lucide-react';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import { useAuth } from '@/contexts/AuthContext';
-
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const { toast } = useToast();
+  const {
+    toast
+  } = useToast();
   const navigate = useNavigate();
-  const { signIn, user } = useAuth();
-
+  const {
+    signIn,
+    user
+  } = useAuth();
   useEffect(() => {
     // Redirect if already logged in
     if (user) {
       navigate('/dashboard');
     }
   }, [user, navigate]);
-
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email || !password) {
       toast({
         title: "Erreur de connexion",
         description: "Veuillez remplir tous les champs",
-        variant: "destructive",
+        variant: "destructive"
       });
       return;
     }
-
     setIsLoading(true);
-    
     try {
-      const { error } = await signIn(email, password);
-      
+      const {
+        error
+      } = await signIn(email, password);
       if (!error) {
         navigate('/dashboard');
       }
@@ -52,9 +52,7 @@ const Login = () => {
       setIsLoading(false);
     }
   };
-
-  return (
-    <div className="min-h-screen flex flex-col">
+  return <div className="min-h-screen flex flex-col">
       <Header />
       <main className="flex-grow flex items-center justify-center bg-gradient-to-b from-white to-soft-blue/10 py-12">
         <div className="container-custom max-w-md">
@@ -72,50 +70,21 @@ const Login = () => {
               <form onSubmit={handleLogin} className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="email">Adresse email</Label>
-                  <Input 
-                    id="email"
-                    type="email"
-                    placeholder="exemple@email.com"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="transition-all focus:border-med-blue"
-                    disabled={isLoading}
-                  />
+                  <Input id="email" type="email" placeholder="exemple@email.com" value={email} onChange={e => setEmail(e.target.value)} className="transition-all focus:border-med-blue" disabled={isLoading} />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="password">Mot de passe</Label>
                   <div className="relative">
-                    <Input 
-                      id="password"
-                      type={showPassword ? "text" : "password"}
-                      placeholder="••••••••"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      className="transition-all focus:border-med-blue pr-10"
-                      disabled={isLoading}
-                    />
-                    <button 
-                      type="button"
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-med-gray hover:text-dark-gray transition-colors"
-                      onClick={() => setShowPassword(!showPassword)}
-                      disabled={isLoading}
-                    >
+                    <Input id="password" type={showPassword ? "text" : "password"} placeholder="••••••••" value={password} onChange={e => setPassword(e.target.value)} className="transition-all focus:border-med-blue pr-10" disabled={isLoading} />
+                    <button type="button" className="absolute right-3 top-1/2 -translate-y-1/2 text-med-gray hover:text-dark-gray transition-colors" onClick={() => setShowPassword(!showPassword)} disabled={isLoading}>
                       {showPassword ? <EyeOffIcon size={18} /> : <EyeIcon size={18} />}
                     </button>
                   </div>
                 </div>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-2">
-                    <Checkbox 
-                      id="remember" 
-                      checked={rememberMe} 
-                      onCheckedChange={() => setRememberMe(!rememberMe)} 
-                      disabled={isLoading}
-                    />
-                    <label 
-                      htmlFor="remember" 
-                      className="text-sm text-med-gray cursor-pointer"
-                    >
+                    <Checkbox id="remember" checked={rememberMe} onCheckedChange={() => setRememberMe(!rememberMe)} disabled={isLoading} />
+                    <label htmlFor="remember" className="text-sm text-med-gray cursor-pointer">
                       Se souvenir de moi
                     </label>
                   </div>
@@ -123,17 +92,11 @@ const Login = () => {
                     Mot de passe oublié ?
                   </a>
                 </div>
-                <Button 
-                  type="submit" 
-                  className="w-full" 
-                  disabled={isLoading}
-                >
-                  {isLoading ? (
-                    <>
+                <Button type="submit" className="w-full" disabled={isLoading}>
+                  {isLoading ? <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                       Connexion...
-                    </>
-                  ) : "Se connecter"}
+                    </> : "Se connecter"}
                 </Button>
               </form>
             </CardContent>
@@ -143,12 +106,7 @@ const Login = () => {
                   Vous n'avez pas encore de compte ?
                 </span>
               </div>
-              <Button 
-                variant="outline" 
-                className="w-full border-med-blue text-med-blue hover:bg-soft-blue"
-                onClick={() => navigate('/register')}
-                disabled={isLoading}
-              >
+              <Button variant="outline" onClick={() => navigate('/register')} disabled={isLoading} className="w-full border-med-blue text-med-blue hover:bg-soft-blue text-zinc-950">
                 Créer un compte
               </Button>
             </CardFooter>
@@ -156,8 +114,6 @@ const Login = () => {
         </div>
       </main>
       <Footer />
-    </div>
-  );
+    </div>;
 };
-
 export default Login;
