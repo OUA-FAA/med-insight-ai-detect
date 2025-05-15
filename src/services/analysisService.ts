@@ -34,7 +34,7 @@ export const saveAnalysisResult = async (
     if (resultError) throw resultError;
     
     // If there are areas, save them too
-    if (result.areas && result.areas.length > 0 && resultData?.id) {
+    if (result.areas && result.areas.length > 0 && resultData) {
       const areasToInsert = result.areas.map(area => ({
         result_id: resultData.id,
         x: area.x,
@@ -71,6 +71,8 @@ export const getUserAnalysisResults = async (userId: string): Promise<AnalysisRe
 
     if (resultsError) throw resultsError;
 
+    if (!results) return [];
+
     // Fetch areas for each result
     const enhancedResults = await Promise.all(
       results.map(async (result) => {
@@ -84,7 +86,7 @@ export const getUserAnalysisResults = async (userId: string): Promise<AnalysisRe
         return {
           ...result,
           areas: areas || [],
-        };
+        } as AnalysisResult;
       })
     );
 
@@ -117,7 +119,7 @@ export const getAnalysisResultById = async (resultId: string): Promise<AnalysisR
     return {
       ...result,
       areas: areas || [],
-    };
+    } as AnalysisResult;
   } catch (error) {
     console.error('Error fetching analysis result by id:', error);
     throw error;

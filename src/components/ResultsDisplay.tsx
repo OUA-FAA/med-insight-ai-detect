@@ -5,9 +5,10 @@ import { FileImage, Info, AlertCircle, Clock, Cpu, Code, HelpCircle, Activity } 
 
 interface ResultsDisplayProps {
   result: DetectionResult;
+  imageUrl?: string;
 }
 
-const ResultsDisplay = ({ result }: ResultsDisplayProps) => {
+const ResultsDisplay = ({ result, imageUrl }: ResultsDisplayProps) => {
   // Calculate result severity color
   const getSeverityColor = (confidence: number) => {
     if (confidence < 40) return 'text-green-600';
