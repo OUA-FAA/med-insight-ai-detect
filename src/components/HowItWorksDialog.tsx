@@ -1,26 +1,12 @@
-
 import React from 'react';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { 
-  FileImage, 
-  Microscope, 
-  FileText, 
-  Info 
-} from 'lucide-react';
+import { FileImage, Microscope, FileText, Info } from 'lucide-react';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-
 const HowItWorksDialog = () => {
-  return (
-    <Dialog>
+  return <Dialog>
       <DialogTrigger asChild>
-        <Button variant="outline" className="border-med-pink text-dark-gray hover:bg-soft-pink hover:bg-opacity-20">
+        <Button variant="outline" className="border-med-pink text-dark-gray hover:bg-soft-pink hover:bg-opacity-20 bg-gray-50">
           <Info className="mr-2 h-4 w-4" />
           Comment ça marche
         </Button>
@@ -156,8 +142,6 @@ const HowItWorksDialog = () => {
           </div>
         </div>
       </DialogContent>
-    </Dialog>
-  );
+    </Dialog>;
 };
-
 export default HowItWorksDialog;
