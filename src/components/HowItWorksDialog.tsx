@@ -6,7 +6,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 const HowItWorksDialog = () => {
   return <Dialog>
       <DialogTrigger asChild>
-        <Button variant="outline" className="border-med-pink text-dark-gray hover:bg-soft-pink hover:bg-opacity-20 bg-gray-50">
+        <Button variant="outline" className="border-med-pink text-dark-gray hover:bg-soft-pink hover:bg-opacity-20 bg-gray-50 text-zinc-950">
           <Info className="mr-2 h-4 w-4" />
           Comment ça marche
         </Button>
