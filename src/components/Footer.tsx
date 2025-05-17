@@ -1,9 +1,6 @@
-
 import React from 'react';
-
 const Footer = () => {
-  return (
-    <footer className="bg-white pt-12 pb-6">
+  return <footer className="bg-white pt-12 pb-6">
       <div className="container-custom">
         <div className="flex flex-col md:flex-row justify-between gap-8 mb-8">
           <div className="md:w-1/2">
@@ -27,8 +24,8 @@ const Footer = () => {
           <div>
             <h3 className="font-medium mb-3">Contact</h3>
             <ul className="space-y-2">
-              <li className="text-med-gray">contact@medcancer.ai</li>
-              <li className="text-med-gray">+33 (0)1 23 45 67 89</li>
+              <li className="text-med-gray">contact@medcancer.com</li>
+              <li className="text-med-gray">+212 600000000</li>
             </ul>
           </div>
         </div>
@@ -47,8 +44,6 @@ const Footer = () => {
           </p>
         </div>
       </div>
-    </footer>
-  );
+    </footer>;
 };
-
 export default Footer;

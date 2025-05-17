@@ -1,13 +1,10 @@
-
 import React from 'react';
 import { Button } from "@/components/ui/button";
 import { useNavigate } from 'react-router-dom';
 import { FileImage, InfoIcon, ArrowDown } from 'lucide-react';
 import HowItWorksDialog from './HowItWorksDialog';
-
 const Hero = () => {
   const navigate = useNavigate();
-  
   const scrollToUpload = () => {
     const uploadSection = document.getElementById('upload');
     if (uploadSection) {
@@ -16,7 +13,6 @@ const Hero = () => {
       });
     }
   };
-
   return <section className="py-12 md:py-20 bg-gradient-to-b from-white to-soft-pink/20">
       <div className="container-custom">
         <div className="flex flex-col md:flex-row items-center">
@@ -30,10 +26,7 @@ const Hero = () => {
               à détecter des anomalies potentielles liées au cancer. Un outil d'assistance rapide et fiable pour les professionnels de santé.
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
-              <Button className="btn-primary group" onClick={scrollToUpload}>
-                <FileImage className="mr-1 h-4 w-4 transition-transform group-hover:scale-110" />
-                Commencer l'analyse
-              </Button>
+              
               <HowItWorksDialog />
             </div>
           </div>
@@ -69,5 +62,4 @@ const Hero = () => {
       </div>
     </section>;
 };
-
 export default Hero;
